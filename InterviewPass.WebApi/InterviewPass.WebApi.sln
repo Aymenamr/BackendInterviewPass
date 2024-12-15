@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34723.18
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InterviewPass.WebApi", "InterviewPass.WebApi\InterviewPass.WebApi.csproj", "{67666C48-3B9B-4B06-A546-C72C2FBB3B3E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterviewPass.DataAccess", "InterviewPass.DataAccess\InterviewPass.DataAccess.csproj", "{6000317B-5D24-4505-99FA-85214B9C727D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{67666C48-3B9B-4B06-A546-C72C2FBB3B3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67666C48-3B9B-4B06-A546-C72C2FBB3B3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67666C48-3B9B-4B06-A546-C72C2FBB3B3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67666C48-3B9B-4B06-A546-C72C2FBB3B3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6000317B-5D24-4505-99FA-85214B9C727D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6000317B-5D24-4505-99FA-85214B9C727D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6000317B-5D24-4505-99FA-85214B9C727D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6000317B-5D24-4505-99FA-85214B9C727D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1F05ED57-04F3-499D-8848-3DEE7EAFF807}
+	EndGlobalSection
+EndGlobal
