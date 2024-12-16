@@ -30,7 +30,7 @@ namespace InterviewPass.WebApi.Controllers
         /// <response code="500">Internal Server Error.</response>
         // GET api/<UserController>/user1
         [HttpGet("{login}")]
-        public UserModel Get(string login)
+        public IActionResult Get(string login)
         {
             var user = _jobSeekerRepository.GetUser(login);
            
@@ -44,7 +44,7 @@ namespace InterviewPass.WebApi.Controllers
                 UserType="JobSeeker"
             };
 
-            return model;
+            return Ok(model);
         }
 
         // GET: api/<UserController
@@ -76,7 +76,7 @@ namespace InterviewPass.WebApi.Controllers
         }
         // POST api/<UserController>
         [HttpPost]
-        public void Post([FromBody] UserModel user)
+        public IActionResult Post([FromBody] UserModel user)
         {
             if (user is UserJobSeekerModel Jsker)
             {
@@ -91,10 +91,12 @@ namespace InterviewPass.WebApi.Controllers
                     LevelOfExperience = Jsker.LevelOfExperience
                 };
                 _jobSeekerRepository.AddUser(userEntity);
+                return CreatedAtAction(nameof(Post), new { id = userEntity.Id }, userEntity);
             }
+            return BadRequest("Unable to detect the type of the user");
         }
 
-        
+
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
         public void Delete(string id)
