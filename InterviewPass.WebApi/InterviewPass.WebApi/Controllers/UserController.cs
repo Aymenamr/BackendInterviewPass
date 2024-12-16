@@ -1,8 +1,7 @@
 ﻿using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.WebApi.Models.User;
 using Microsoft.AspNetCore.Mvc;
-using System.Numerics;
-using System.Xml.Linq;
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -33,6 +32,7 @@ namespace InterviewPass.WebApi.Controllers
         public UserModel Get(string id)
         {
             var user = _userRepository.GetUser(id);
+           
             UserModel model = new UserModel()
             {
                 Id = user.Id,
@@ -41,6 +41,7 @@ namespace InterviewPass.WebApi.Controllers
                 Login = user.Login,
                 Phone = user.Phone,
             };
+
             return model;
         }
 
@@ -55,7 +56,9 @@ namespace InterviewPass.WebApi.Controllers
         public List<UserModel> Get()
         {
             List<UserModel> usersModel = new List<UserModel>();
+          
             var users= _userRepository.GetUsers();
+           
             foreach(var user in users)
             {
                 usersModel.Add(

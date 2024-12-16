@@ -79,6 +79,7 @@ public partial class InterviewPassContext : DbContext
             entity.Property(e => e.MaxScore).HasColumnType("DOUBLE");
             entity.Property(e => e.MinScore).HasColumnType("DOUBLE");
             entity.Property(e => e.Name).HasColumnType("VARCHAR");
+            entity.Property(e => e.StartingDate).HasColumnType("DATETIME");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.Exams).HasForeignKey(d => d.CreatedBy);
         });
