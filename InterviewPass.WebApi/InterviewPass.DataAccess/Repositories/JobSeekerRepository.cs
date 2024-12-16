@@ -19,14 +19,13 @@ namespace InterviewPass.DataAccess.Services
 
         public void DeleteUser(string id)
         {
-
             _dbContext.UserJobSeekers.Remove(GetUser(id));
         }
 
 
-        public UserJobSeeker GetUser(string id)
+        public UserJobSeeker GetUser(string login)
         {
-            return _dbContext.UserJobSeekers.FirstOrDefault(x => x.Id == id);
+            return _dbContext.UserJobSeekers.FirstOrDefault(x => x.Login == login);
         }
 
         public List<UserJobSeeker> GetUsers()

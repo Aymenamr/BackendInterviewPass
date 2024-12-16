@@ -1,4 +1,5 @@
-﻿using InterviewPass.DataAccess.Repositories.Interfaces;
+﻿using InterviewPass.DataAccess.Entities;
+using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.WebApi.Models.User;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,11 +13,11 @@ namespace InterviewPass.WebApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
-        private readonly IJobSeekerRepository _userRepository;
+        private readonly IJobSeekerRepository _jobSeekerRepository;
         public UserController(ILogger<UserController> logger,IJobSeekerRepository userRepository)
         {
             _logger = logger;
-            _userRepository = userRepository;
+            _jobSeekerRepository = userRepository;
         }
       
         /// <summary>
@@ -27,19 +28,20 @@ namespace InterviewPass.WebApi.Controllers
         /// <response code="200">User found and returned successfully.</response>
         /// <response code="404">User not found.</response>
         /// <response code="500">Internal Server Error.</response>
-        // GET api/<UserController>/5
-        [HttpGet("{id}")]
-        public UserModel Get(string id)
+        // GET api/<UserController>/user1
+        [HttpGet("{login}")]
+        public UserModel Get(string login)
         {
-            var user = _userRepository.GetUser(id);
+            var user = _jobSeekerRepository.GetUser(login);
            
-            UserModel model = new UserModel()
+            UserModel model = new UserJobSeekerModel()
             {
                 Id = user.Id,
                 Name = user.Name,
                 Email = user.Email,
                 Login = user.Login,
                 Phone = user.Phone,
+                UserType="JobSeeker"
             };
 
             return model;
@@ -52,17 +54,17 @@ namespace InterviewPass.WebApi.Controllers
         /// <returns>A collection of User objects.</returns>
         /// <response code="200">Returns the list of users successfully.</response>
         /// <response code="500">If there is an error retrieving the data.</response>
-        [HttpGet]
-        public List<UserModel> Get()
+        [HttpGet("users")]
+        public List<UserModel> GetUsers(string userType)
         {
             List<UserModel> usersModel = new List<UserModel>();
           
-            var users= _userRepository.GetUsers();
+            var users= _jobSeekerRepository.GetUsers();
            
             foreach(var user in users)
             {
                 usersModel.Add(
-                    new UserModel {
+                    new UserJobSeekerModel {
                                 Id = user.Id,
                                 Name = user.Name,
                                 Email = user.Email,
@@ -76,9 +78,19 @@ namespace InterviewPass.WebApi.Controllers
         [HttpPost]
         public void Post([FromBody] UserModel user)
         {
-            if (user is UserJobSeekerModel)
+            if (user is UserJobSeekerModel Jsker)
             {
-                //_userRepository.AddUser(user);
+                var userEntity = new UserJobSeeker()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = user.Email,
+                    Login = user.Login,
+                    Name = user.Name,
+                    Phone = user.Phone,
+                    Password = user.Password,
+                    LevelOfExperience = Jsker.LevelOfExperience
+                };
+                _jobSeekerRepository.AddUser(userEntity);
             }
         }
 
@@ -87,7 +99,7 @@ namespace InterviewPass.WebApi.Controllers
         [HttpDelete("{id}")]
         public void Delete(string id)
         {
-            _userRepository.DeleteUser(id);
+            _jobSeekerRepository.DeleteUser(id);
         }
     }
 }
