@@ -19,7 +19,6 @@ public partial class Exam
 
     public string? CreatedBy { get; set; }
 
-    public DateTime StartingDate { get; set; }
 
     public int? NbrOfQuestion { get; set; }
 
