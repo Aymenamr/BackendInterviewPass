@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace InterviewPass.DataAccess.Entities;
 
 public partial class InterviewPassContext : DbContext
 {
-    public InterviewPassContext()
+    public string DbPath { get { return _configuration["DbPath"]; } }
+    private IConfiguration _configuration;
+    public InterviewPassContext(IConfiguration configuration)
     {
+        _configuration = configuration;
     }
 
     public InterviewPassContext(DbContextOptions<InterviewPassContext> options)
@@ -40,8 +44,7 @@ public partial class InterviewPassContext : DbContext
     public virtual DbSet<UserJobSeeker> UserJobSeekers { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlite("DataSource=C:\\aymen\\Mentorship\\CapableGraduate\\InterviewPass.WebApi-Session3\\InterviewPass.DataAccess\\Database\\interviewPass.db");
+        => optionsBuilder.UseSqlite(string.Format("DataSource={0}",DbPath));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -207,7 +210,7 @@ public partial class InterviewPassContext : DbContext
             entity.Property(e => e.Email).HasColumnType("STRING");
             entity.Property(e => e.Login).HasColumnType("STRING");
             entity.Property(e => e.Name).HasColumnType("STRING");
-            entity.Property(e => e.Password).HasColumnType("VARCHAR");
+            entity.Property(e => e.PasswordHash).HasColumnType("VARCHAR");
             entity.Property(e => e.Phone).HasColumnType("VARCHAR");
         });
 

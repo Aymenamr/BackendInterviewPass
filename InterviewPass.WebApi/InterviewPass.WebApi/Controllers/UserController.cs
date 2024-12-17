@@ -33,6 +33,8 @@ namespace InterviewPass.WebApi.Controllers
         public IActionResult Get(string login)
         {
             var user = _jobSeekerRepository.GetUser(login);
+            if (user == null)
+                return NotFound();
            
             UserModel model = new UserJobSeekerModel()
             {
@@ -55,7 +57,7 @@ namespace InterviewPass.WebApi.Controllers
         /// <response code="200">Returns the list of users successfully.</response>
         /// <response code="500">If there is an error retrieving the data.</response>
         [HttpGet("users")]
-        public List<UserModel> GetUsers(string userType)
+        public IActionResult GetUsers(string userType)
         {
             List<UserModel> usersModel = new List<UserModel>();
           
@@ -72,8 +74,16 @@ namespace InterviewPass.WebApi.Controllers
                                 Phone = user.Phone,
                                 });
             }
-            return usersModel;
+            return Ok(usersModel);
         }
+        /// <summary>
+        /// Add a new user to the database
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+       /// <response code="201">The user was successfully created.</response>
+       /// <response code="400">The user introduced has bad data format.</response>
+        /// <response code="500">If there is an error retrieving the data.</response>
         // POST api/<UserController>
         [HttpPost]
         public IActionResult Post([FromBody] UserModel user)
@@ -87,7 +97,7 @@ namespace InterviewPass.WebApi.Controllers
                     Login = user.Login,
                     Name = user.Name,
                     Phone = user.Phone,
-                    Password = user.Password,
+                    PasswordHash = user.Password,
                     LevelOfExperience = Jsker.LevelOfExperience
                 };
                 _jobSeekerRepository.AddUser(userEntity);
@@ -99,9 +109,10 @@ namespace InterviewPass.WebApi.Controllers
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
-        public void Delete(string id)
+        public IActionResult Delete(string id)
         {
             _jobSeekerRepository.DeleteUser(id);
+            return Ok();
         }
     }
 }

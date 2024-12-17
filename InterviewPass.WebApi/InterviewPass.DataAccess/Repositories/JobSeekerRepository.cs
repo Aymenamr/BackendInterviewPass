@@ -15,6 +15,7 @@ namespace InterviewPass.DataAccess.Services
         public void AddUser(UserJobSeeker user)
         {
           _dbContext.UserJobSeekers.Add(user);
+          _dbContext.SaveChanges();
         }
 
         public void DeleteUser(string id)

@@ -13,7 +13,7 @@ public partial class UserJobSeeker
 
     public string? Phone { get; set; }
 
-    public string? Password { get; set; }
+    public string? PasswordHash { get; set; }
 
     public int? LevelOfExperience { get; set; }
 

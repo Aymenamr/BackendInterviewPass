@@ -11,19 +11,16 @@ using InterviewPass.WebApi.Models.User;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
-    //Register the subtypes of the Device (Phone and Laptop)
-    //and define the device Discriminator
-    options.SerializerSettings.Converters.Add(
-        JsonSubtypesConverterBuilder
-        .Of(typeof(UserModel), "UserType")
-        .RegisterSubtype(typeof(UserJobSeekerModel), "JobSeeker")
-        .RegisterSubtype(typeof(UserHrModel), "Hr")
-        .SerializeDiscriminatorProperty()
-        .Build()
-    );
+//and define the device Discriminator
+options.SerializerSettings.Converters.Add(
+    JsonSubtypesConverterBuilder
+    .Of(typeof(UserModel), "UserType")
+    .RegisterSubtype(typeof(UserJobSeekerModel), "JobSeeker")
+    .RegisterSubtype(typeof(UserHrModel), "Hr")
+    .SerializeDiscriminatorProperty()
+    .Build());
 
 });
 
@@ -36,9 +33,9 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 //Dependency injection
+builder.Services.AddTransient<DbContext, InterviewPassContext>();
 builder.Services.AddTransient<IExamRepository, ExamRepository>();
 builder.Services.AddTransient<IJobSeekerRepository, JobSeekerRepository>();
-builder.Services.AddTransient<DbContext, InterviewPassContext>();
 
 
 var app = builder.Build();
