@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using JsonSubTypes;
 using InterviewPass.WebApi.Models.User;
+using InterviewPass.WebApi.Mapper;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,9 @@ options.SerializerSettings.Converters.Add(
     .Build());
 
 });
+
+// Add AutoMapper to the service container
+builder.Services.AddAutoMapper(typeof(MappingProfile)); // Registers all profiles automatically
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

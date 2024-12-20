@@ -1,4 +1,5 @@
-﻿using InterviewPass.DataAccess.Entities;
+﻿using AutoMapper;
+using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.WebApi.Models.User;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +15,13 @@ namespace InterviewPass.WebApi.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IJobSeekerRepository _jobSeekerRepository;
-        public UserController(ILogger<UserController> logger,IJobSeekerRepository userRepository)
+        private readonly IMapper _mapper;
+
+        public UserController(ILogger<UserController> logger,IJobSeekerRepository userRepository, IMapper mapper)
         {
             _logger = logger;
             _jobSeekerRepository = userRepository;
+            _mapper = mapper;
         }
       
         /// <summary>
@@ -34,19 +38,9 @@ namespace InterviewPass.WebApi.Controllers
         {
             var user = _jobSeekerRepository.GetUser(login);
             if (user == null)
-                return NotFound();
-           
-            UserModel model = new UserJobSeekerModel()
-            {
-                Id = user.Id,
-                Name = user.Name,
-                Email = user.Email,
-                Login = user.Login,
-                Phone = user.Phone,
-                UserType="JobSeeker"
-            };
+                return NotFound();                    
 
-            return Ok(model);
+            return Ok(_mapper.Map<UserJobSeeker>(user));
         }
 
         // GET: api/<UserController
@@ -65,14 +59,7 @@ namespace InterviewPass.WebApi.Controllers
            
             foreach(var user in users)
             {
-                usersModel.Add(
-                    new UserJobSeekerModel {
-                                Id = user.Id,
-                                Name = user.Name,
-                                Email = user.Email,
-                                Login = user.Login,
-                                Phone = user.Phone,
-                                });
+                usersModel.Add(_mapper.Map<UserJobSeekerModel>(user));
             }
             return Ok(usersModel);
         }
@@ -90,16 +77,7 @@ namespace InterviewPass.WebApi.Controllers
         {
             if (user is UserJobSeekerModel Jsker)
             {
-                var userEntity = new UserJobSeeker()
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Email = user.Email,
-                    Login = user.Login,
-                    Name = user.Name,
-                    Phone = user.Phone,
-                    PasswordHash = user.Password,
-                    LevelOfExperience = Jsker.LevelOfExperience
-                };
+                var userEntity = _mapper.Map<UserJobSeeker>(user);
                 _jobSeekerRepository.AddUser(userEntity);
                 return CreatedAtAction(nameof(Post), new { id = userEntity.Id }, userEntity);
             }
