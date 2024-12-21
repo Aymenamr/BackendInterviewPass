@@ -108,15 +108,22 @@ public partial class InterviewPassContext : DbContext
 
         modelBuilder.Entity<Question>(entity =>
         {
-            entity.ToTable("Question");
-
+            entity.ToTable("Question").HasDiscriminator<string>("Type")
+                                        .HasValue<MultipleChoiceQuestion>("MultipleChoice") // Maps to MultipleChoiceQuestion subclass
+                                        .HasValue<TrueFalseQuestion>("TrueFalse")         // Maps to TrueFalseQuestion subclass
+                                        .HasValue<ObjectiveQuestion>("Objective")        // Maps to ObjectiveQuestion subclass
+                                        .HasValue<PracticalQuestion>("Practical");       // Maps to PracticalQuestion subclass;
             entity.Property(e => e.Id).HasColumnType("STRING");
             entity.Property(e => e.Content).HasColumnType("STRING");
-            entity.Property(e => e.HasSignleChoice).HasColumnType("BOOLEAN");
-            entity.Property(e => e.IsTrue).HasColumnType("BOOLEAN");
             entity.Property(e => e.Score).HasColumnType("DOUBLE");
             entity.Property(e => e.Type).HasColumnType("STRING");
         });
+        // Subclass-specific properties should be configured with their respective classes
+        modelBuilder.Entity<MultipleChoiceQuestion>()
+            .Property(e => e.HasSignleChoice).HasColumnType("BOOLEAN");
+
+        modelBuilder.Entity<TrueFalseQuestion>()
+            .Property(e => e.IsTrue).HasColumnType("BOOLEAN");
 
         modelBuilder.Entity<QuestionExam>(entity =>
         {

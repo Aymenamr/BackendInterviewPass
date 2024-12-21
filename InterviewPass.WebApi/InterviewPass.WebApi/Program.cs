@@ -40,6 +40,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddTransient<DbContext, InterviewPassContext>();
 builder.Services.AddTransient<IExamRepository, ExamRepository>();
 builder.Services.AddTransient<IJobSeekerRepository, JobSeekerRepository>();
+builder.Services.AddTransient<IQuestionRepository, QuestionRepository>();
 
 
 var app = builder.Build();
