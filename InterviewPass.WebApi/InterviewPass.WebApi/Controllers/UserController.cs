@@ -81,6 +81,12 @@ namespace InterviewPass.WebApi.Controllers
                 _jobSeekerRepository.AddUser(userEntity);
                 return CreatedAtAction(nameof(Post), new { id = userEntity.Id }, userEntity);
             }
+            else if(user is UserHrModel hr)
+            {
+                //TODO Call HR Repository
+                return CreatedAtAction(nameof(Post), null);
+
+            }
             return BadRequest("Unable to detect the type of the user");
         }
 
