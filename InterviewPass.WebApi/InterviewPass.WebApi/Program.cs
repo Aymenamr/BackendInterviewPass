@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using JsonSubTypes;
 using InterviewPass.WebApi.Models.User;
-
+using InterviewPass.WebApi.Mapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +32,7 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
 });
 
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 //Dependency injection
 builder.Services.AddTransient<DbContext, InterviewPassContext>();
 builder.Services.AddTransient<IExamRepository, ExamRepository>();

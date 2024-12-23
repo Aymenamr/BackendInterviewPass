@@ -14,6 +14,7 @@ namespace InterviewPass.DataAccess.Services
       
         public void AddUser(UserJobSeeker user)
         {
+           user.Id = Guid.NewGuid().ToString();
           _dbContext.UserJobSeekers.Add(user);
           _dbContext.SaveChanges();
         }

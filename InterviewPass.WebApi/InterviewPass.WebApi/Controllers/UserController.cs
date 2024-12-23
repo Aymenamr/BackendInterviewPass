@@ -1,5 +1,7 @@
-﻿using InterviewPass.DataAccess.Entities;
+﻿using AutoMapper;
+using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories.Interfaces;
+using InterviewPass.WebApi.Mapper;
 using InterviewPass.WebApi.Models.User;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,10 +16,12 @@ namespace InterviewPass.WebApi.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IJobSeekerRepository _jobSeekerRepository;
-        public UserController(ILogger<UserController> logger,IJobSeekerRepository userRepository)
+        private readonly IMapper _mapper;
+        public UserController(ILogger<UserController> logger,IJobSeekerRepository userRepository, IMapper mapper)
         {
             _logger = logger;
             _jobSeekerRepository = userRepository;
+            _mapper = mapper;
         }
       
         /// <summary>
@@ -65,14 +69,7 @@ namespace InterviewPass.WebApi.Controllers
            
             foreach(var user in users)
             {
-                usersModel.Add(
-                    new UserJobSeekerModel {
-                                Id = user.Id,
-                                Name = user.Name,
-                                Email = user.Email,
-                                Login = user.Login,
-                                Phone = user.Phone,
-                                });
+                usersModel.Add(_mapper.Map<UserJobSeekerModel>(user));
             }
             return Ok(usersModel);
         }
@@ -89,19 +86,11 @@ namespace InterviewPass.WebApi.Controllers
         public IActionResult Post([FromBody] UserModel user)
         {
             if (user is UserJobSeekerModel Jsker)
-            {
-                var userEntity = new UserJobSeeker()
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Email = user.Email,
-                    Login = user.Login,
-                    Name = user.Name,
-                    Phone = user.Phone,
-                    PasswordHash = user.Password,
-                    LevelOfExperience = Jsker.LevelOfExperience
-                };
+            {                
+                var userEntity = _mapper.Map<UserJobSeeker>(Jsker);
+
                 _jobSeekerRepository.AddUser(userEntity);
-                return CreatedAtAction(nameof(Post), new { id = userEntity.Id }, userEntity);
+                return CreatedAtAction(nameof(Post), new { id = userEntity.Id }, Jsker);
             }
             return BadRequest("Unable to detect the type of the user");
         }
