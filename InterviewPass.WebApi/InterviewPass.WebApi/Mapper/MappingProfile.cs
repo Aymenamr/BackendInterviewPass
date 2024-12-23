@@ -10,6 +10,8 @@ namespace InterviewPass.WebApi.Mapper
         {
             CreateMap<UserJobSeekerModel, UserJobSeeker>();
             CreateMap<UserJobSeeker,UserJobSeekerModel>();
+            CreateMap<UserHrModel,UserHr>();
+            CreateMap<UserHr,UserHrModel>();
         }
     }
 }

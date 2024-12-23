@@ -7,6 +7,7 @@ using System.Reflection;
 using JsonSubTypes;
 using InterviewPass.WebApi.Models.User;
 using InterviewPass.WebApi.Mapper;
+using InterviewPass.WebApi.Enums;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,8 +18,8 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 options.SerializerSettings.Converters.Add(
     JsonSubtypesConverterBuilder
     .Of(typeof(UserModel), "UserType")
-    .RegisterSubtype(typeof(UserJobSeekerModel), "JobSeeker")
-    .RegisterSubtype(typeof(UserHrModel), "Hr")
+    .RegisterSubtype(typeof(UserJobSeekerModel), UserType.JobSeeker)
+    .RegisterSubtype(typeof(UserHrModel),UserType.Hr)
     .SerializeDiscriminatorProperty()
     .Build());
 
@@ -36,7 +37,17 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 //Dependency injection
 builder.Services.AddTransient<DbContext, InterviewPassContext>();
 builder.Services.AddTransient<IExamRepository, ExamRepository>();
-builder.Services.AddTransient<IJobSeekerRepository, JobSeekerRepository>();
+builder.Services.AddTransient<JobSeekerRepository>();
+builder.Services.AddTransient<HrRepository>();
+builder.Services.AddTransient<Func<string, IUserRepository>>(serviceProvider => key =>
+{
+    return key switch
+    {
+        "JobSeeker" => serviceProvider.GetRequiredService<JobSeekerRepository>(),
+        "Hr" => serviceProvider.GetRequiredService<HrRepository>(),
+        _ => throw new KeyNotFoundException("Service not found.")
+    };
+});
 
 
 var app = builder.Build();

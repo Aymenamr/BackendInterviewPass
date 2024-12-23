@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories.Interfaces;
+using InterviewPass.WebApi.Enums;
+using InterviewPass.WebApi.Extensions;
 using InterviewPass.WebApi.Mapper;
 using InterviewPass.WebApi.Models.User;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -15,12 +18,15 @@ namespace InterviewPass.WebApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
-        private readonly IJobSeekerRepository _jobSeekerRepository;
+        private readonly Func<string, IUserRepository> _userRepoResolver;
+
+        private readonly IUserRepository _jobSeekerRepository;
+        private readonly IUserRepository _hrRepository;
         private readonly IMapper _mapper;
-        public UserController(ILogger<UserController> logger,IJobSeekerRepository userRepository, IMapper mapper)
+        public UserController(ILogger<UserController> logger, Func<string, IUserRepository> userRepoResolver, IMapper mapper)
         {
             _logger = logger;
-            _jobSeekerRepository = userRepository;
+            _userRepoResolver = userRepoResolver;
             _mapper = mapper;
         }
       
@@ -34,23 +40,33 @@ namespace InterviewPass.WebApi.Controllers
         /// <response code="500">Internal Server Error.</response>
         // GET api/<UserController>/user1
         [HttpGet("{login}")]
-        public IActionResult Get(string login)
+        public IActionResult Get(string login,UserType userType)
         {
-            var user = _jobSeekerRepository.GetUser(login);
-            if (user == null)
-                return NotFound();
-           
-            UserModel model = new UserJobSeekerModel()
-            {
-                Id = user.Id,
-                Name = user.Name,
-                Email = user.Email,
-                Login = user.Login,
-                Phone = user.Phone,
-                UserType="JobSeeker"
-            };
+            // Retrieve the user from the repository
+            var user = _userRepoResolver(userType.ToString()).GetUser(login);
+            
+            if(user == null)
+            { 
+                return NotFound("The requested user was not found");
+            }
 
-            return Ok(model);
+            switch (userType)
+            {
+                case UserType.JobSeeker:
+                    {
+                        UserJobSeekerModel seeker = _mapper.Map<UserJobSeekerModel>(user);
+                        return Ok(seeker);
+                    }
+                case UserType.Hr:
+                    {
+                        UserHrModel hr = _mapper.Map<UserHrModel>(user);
+                        return Ok(hr);
+                    }
+
+                default:
+                    return BadRequest("Bad User type");
+
+            }        
         }
 
         // GET: api/<UserController
@@ -61,18 +77,28 @@ namespace InterviewPass.WebApi.Controllers
         /// <response code="200">Returns the list of users successfully.</response>
         /// <response code="500">If there is an error retrieving the data.</response>
         [HttpGet("users")]
-        public IActionResult GetUsers(string userType)
+        public IActionResult GetUsers(UserType userType)
         {
-            List<UserModel> usersModel = new List<UserModel>();
-          
-            var users= _jobSeekerRepository.GetUsers();
-           
-            foreach(var user in users)
+            // Retrieve users from the repository
+            var users = _userRepoResolver(userType.ToString()).GetUsers();
+            switch(userType)
             {
-                usersModel.Add(_mapper.Map<UserJobSeekerModel>(user));
+                case UserType.JobSeeker:
+                    {
+                        List<UserJobSeekerModel> seekers = _mapper.Map<List<UserJobSeekerModel>>(users);
+                        return Ok(seekers);
+                    }
+                case UserType.Hr:
+                    {
+                        List<UserHrModel> hrs = _mapper.Map<List<UserHrModel>>(users);
+                        return Ok(hrs);
+                    }
+
+                default:
+                    return BadRequest("Bad User type");
+
             }
-            return Ok(usersModel);
-        }
+       }
         /// <summary>
         /// Add a new user to the database
         /// </summary>
@@ -85,16 +111,18 @@ namespace InterviewPass.WebApi.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] UserModel user)
         {
-            if (user is UserJobSeekerModel Jsker)
-            {                
-                var userEntity = _mapper.Map<UserJobSeeker>(Jsker);
-
-                _jobSeekerRepository.AddUser(userEntity);
-                return CreatedAtAction(nameof(Post), new { id = userEntity.Id }, Jsker);
+            User userEntity = user.GetUserEntiy(_mapper);
+            if (_userRepoResolver(user.UserType).GetUser(user.Name) == null)
+            {
+                _hrRepository.AddUser(userEntity);
             }
-            return BadRequest("Unable to detect the type of the user");
+            else
+            {
+                return Conflict("The Login already Exists !");
+            }
+            return CreatedAtAction(nameof(Post), new { id = userEntity.Id }, user);
         }
-
+        
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]

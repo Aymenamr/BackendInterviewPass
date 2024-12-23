@@ -1,41 +1,42 @@
 ﻿using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace InterviewPass.DataAccess.Services
 {
-    public class JobSeekerRepository : IUserRepository
+    public class HrRepository : IUserRepository
     {
         InterviewPassContext _dbContext;
-        public JobSeekerRepository(DbContext dbContext) 
+        public HrRepository(DbContext dbContext) 
         {
             _dbContext = dbContext as InterviewPassContext;
         }
       
         public void AddUser(User user)
         {
-            var seeker = user as UserJobSeeker;
-            seeker.Id = Guid.NewGuid().ToString();
-            _dbContext.UserJobSeekers.Add(seeker);
-            _dbContext.SaveChanges();
+            var hr = user as UserHr;
+           user.Id = Guid.NewGuid().ToString();
+          _dbContext.UserHrs.Add(hr);
+          _dbContext.SaveChanges();
         }
 
         public void DeleteUser(string id)
         {
-            _dbContext.UserJobSeekers.Remove(GetUser(id) as UserJobSeeker);
+            _dbContext.UserHrs.Remove(GetUser(id) as UserHr);
             _dbContext.SaveChanges();
         }
 
 
         public User GetUser(string login)
         {
-            return _dbContext.UserJobSeekers.FirstOrDefault(x => x.Login == login);
+            return _dbContext.UserHrs.FirstOrDefault(x => x.Login == login);
         }
 
         public List<User> GetUsers()
         {
-            List<User> seekers = [.. _dbContext.UserJobSeekers.ToList()];
-            return seekers;
+            List <User> hrs = [.. _dbContext.UserHrs.ToList()];
+            return hrs;
         }
     }
 }

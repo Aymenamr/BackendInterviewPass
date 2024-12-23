@@ -3,21 +3,9 @@ using System.Collections.Generic;
 
 namespace InterviewPass.DataAccess.Entities;
 
-public partial class UserJobSeeker
-{
-    public string? Login { get; set; }
-
-    public string Name { get; set; } = null!;
-
-    public string? Email { get; set; }
-
-    public string? Phone { get; set; }
-
-    public string? PasswordHash { get; set; }
-
+public partial class UserJobSeeker : User
+{ 
     public int? LevelOfExperience { get; set; }
-
-    public string Id { get; set; } = null!;
 
     public virtual ICollection<Answer> Answers { get; set; } = new List<Answer>();
 
