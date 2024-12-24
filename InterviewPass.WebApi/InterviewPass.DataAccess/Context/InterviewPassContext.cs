@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using InterviewPass.DataAccess.Entities.Questions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -108,16 +109,23 @@ public partial class InterviewPassContext : DbContext
 
         modelBuilder.Entity<Question>(entity =>
         {
-            entity.ToTable("Question");
+            entity.ToTable("Question").HasDiscriminator<string>("Type")
+                                       .HasValue<MultipleChoiceQuestion>("MultipleChoice")
+                                       .HasValue<TrueFalseQuestion>("TrueFalse")
+                                       .HasValue<ObjectiveQuestion>("Objective")
+                                       .HasValue<PracticalQuestion>("Practical");
 
             entity.Property(e => e.Id).HasColumnType("STRING");
-            entity.Property(e => e.Content).HasColumnType("STRING");
-            entity.Property(e => e.HasSignleChoice).HasColumnType("BOOLEAN");
-            entity.Property(e => e.IsTrue).HasColumnType("BOOLEAN");
+            entity.Property(e => e.Content).HasColumnType("STRING");            
             entity.Property(e => e.Score).HasColumnType("DOUBLE");
             entity.Property(e => e.Type).HasColumnType("STRING");
         });
 
+        modelBuilder.Entity<MultipleChoiceQuestion>()
+                .Property(e => e.HasSignleChoice).HasColumnType("BOOLEAN");
+
+        modelBuilder.Entity<TrueFalseQuestion>()
+                .Property(e => e.IsTrue).HasColumnType("BOOLEAN");
         modelBuilder.Entity<QuestionExam>(entity =>
         {
             entity.Property(e => e.IdExam).HasColumnType("STRING");

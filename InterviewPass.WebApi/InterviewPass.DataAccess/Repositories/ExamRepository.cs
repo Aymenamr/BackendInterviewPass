@@ -14,25 +14,31 @@ namespace InterviewPass.DataAccess.Repositories
         }
         public void AddExam(Exam exam)
         {
+            exam.Id = Guid.NewGuid().ToString();
+            _dbContext.Add(exam);
+            _dbContext.SaveChanges();
         }
 
         public void UpdateExam(Exam exam)
         {
-         
+             _dbContext.Update(exam);
+             _dbContext.SaveChanges();
         }
 
-        public void DeleteExam(int id)
+        public void DeleteExam(string id)
         {
+            _dbContext.Remove(RetrieveExam(id));
+            _dbContext.SaveChanges();
         }
 
-        public IEnumerable<Exam> RetrieveAll()
+        public List<Exam> RetrieveAll()
         {
-            return null;
+            return _dbContext.Exams.ToList();
         }
 
-        public Exam RetrieveExam(int id)
+        public Exam RetrieveExam(string id)
         {
-            return null;
+            return _dbContext.Exams.FirstOrDefault(i => i.Id == id);
         }
     }
 }

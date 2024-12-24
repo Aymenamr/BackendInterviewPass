@@ -5,9 +5,9 @@ namespace InterviewPass.DataAccess.Repositories.Interfaces
 {
     public interface IExamRepository
     {
-        IEnumerable<Exam> RetrieveAll();
-        Exam RetrieveExam(int id);
-        void DeleteExam(int id);
+        List<Exam> RetrieveAll();
+        Exam RetrieveExam(string id);
+        void DeleteExam(string id);
         void AddExam(Exam exam);
 
     }

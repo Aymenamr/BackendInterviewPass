@@ -15,7 +15,7 @@ namespace InterviewPass.DataAccess.Services
       
         public void AddUser(User user)
         {
-            var hr = user as UserHr;
+           var hr = user as UserHr;
            user.Id = Guid.NewGuid().ToString();
           _dbContext.UserHrs.Add(hr);
           _dbContext.SaveChanges();

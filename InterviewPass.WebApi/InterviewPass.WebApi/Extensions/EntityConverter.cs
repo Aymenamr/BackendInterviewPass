@@ -5,7 +5,7 @@ using InterviewPass.WebApi.Models.User;
 namespace InterviewPass.WebApi.Extensions
 {
     public static class EntityConverter
-    {
+    {    
         public static User GetUserEntiy(this UserModel model,IMapper mapper)
         {
             User userEntity = null;

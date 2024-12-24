@@ -11,10 +11,6 @@ public partial class Question
 
     public double? Score { get; set; }
 
-    public bool? HasSignleChoice { get; set; }
-
-    public bool? IsTrue { get; set; }
-
     public string? Type { get; set; }
 
     public virtual ICollection<Answer> Answers { get; set; } = new List<Answer>();
