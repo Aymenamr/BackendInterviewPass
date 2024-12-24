@@ -7,6 +7,7 @@ namespace InterviewPass.DataAccess.Repositories.Interfaces
     {
         List<Exam> RetrieveAll();
         Exam RetrieveExam(string id);
+        Exam RetrieveExamByName(string id);
         void DeleteExam(string id);
         void AddExam(Exam exam);
 

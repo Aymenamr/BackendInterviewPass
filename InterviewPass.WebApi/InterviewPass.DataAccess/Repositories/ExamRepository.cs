@@ -40,5 +40,10 @@ namespace InterviewPass.DataAccess.Repositories
         {
             return _dbContext.Exams.FirstOrDefault(i => i.Id == id);
         }
+
+        public Exam RetrieveExamByName(string name)
+        {
+            return _dbContext.Exams.ToList().FirstOrDefault(i => string.Equals(name,i.Name,StringComparison.OrdinalIgnoreCase));
+        }
     }
 }

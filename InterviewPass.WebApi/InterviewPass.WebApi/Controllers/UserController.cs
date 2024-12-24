@@ -20,8 +20,7 @@ namespace InterviewPass.WebApi.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly Func<string, IUserRepository> _userRepoResolver;
 
-        private readonly IUserRepository _jobSeekerRepository;
-        private readonly IUserRepository _hrRepository;
+        
         private readonly IMapper _mapper;
         public UserController(ILogger<UserController> logger, Func<string, IUserRepository> userRepoResolver, IMapper mapper)
         {
@@ -114,7 +113,7 @@ namespace InterviewPass.WebApi.Controllers
             User userEntity = user.GetUserEntiy(_mapper);
             if (_userRepoResolver(user.UserType).GetUser(user.Name) == null)
             {
-                _hrRepository.AddUser(userEntity);
+                _userRepoResolver(user.UserType).AddUser(userEntity);
             }
             else
             {
@@ -126,9 +125,9 @@ namespace InterviewPass.WebApi.Controllers
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(string id)
+        public IActionResult Delete(string id,UserType type)
         {
-            _jobSeekerRepository.DeleteUser(id);
+            _userRepoResolver(type.ToString()).DeleteUser(id);
             return Ok();
         }
     }

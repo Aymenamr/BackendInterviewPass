@@ -23,24 +23,34 @@ namespace InterviewPass.WebApi.Controllers
         }
         // GET: api/<ExamController>
         [HttpGet]
-        public IEnumerable<ExamModel> Get()
+        public IActionResult Get()
         {
-            return _mapper.Map<List<ExamModel>>(_examRepository.RetrieveAll());
+            return Ok(_mapper.Map<List<ExamModel>>(_examRepository.RetrieveAll()));
         }
 
         // GET api/<ExamController>/5
         [HttpGet("{id}")]
-        public ExamModel Get(int id)
+        public IActionResult Get(string id)
         {
-            return null;
+            var examEntity = _examRepository.RetrieveExam(id);
+            if(examEntity == null) 
+            { 
+                return NotFound("Exam not found"); 
+            }
+            return Ok(_mapper.Map<Exam>(examEntity)) ;
         }
 
         // POST api/<ExamController>
         [HttpPost]
-        public void Post([FromBody] ExamModel exam)
+        public IActionResult Post([FromBody] ExamModel exam)
         {
             Exam examEntity = _mapper.Map<Exam>(exam);
+            if (_examRepository.RetrieveExamByName(exam.Name) != null)
+            {
+                return Conflict("The Exam name already Exists !");
+            }
             _examRepository.AddExam(examEntity);
+            return CreatedAtAction(nameof(Post), new { id = examEntity.Id }, exam);
         }
 
 
