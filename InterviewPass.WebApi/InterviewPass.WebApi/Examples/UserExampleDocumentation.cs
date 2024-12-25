@@ -14,10 +14,11 @@ namespace InterviewPass.WebApi.Examples
                     DateOfBirth = DateTime.Parse("22-10-1965"),
                      Email="test@gmail.com",
                      LevelOfExperience=10,
-                     Login="test 1",
+                     Login="test1",
                      Name="first name",
                      PasswordHash= "3cdbe355f60f1b4d04496cfe9879ab62851b58ab",
-                     UserType="JobSeeker"
+                     UserType="JobSeeker",
+                     Phone="12344"
 
                 });
         }
