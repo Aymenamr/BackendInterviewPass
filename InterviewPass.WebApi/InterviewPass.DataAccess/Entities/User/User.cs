@@ -14,6 +14,8 @@ namespace InterviewPass.DataAccess.Entities
 
         public string Name { get; set; } = null!;
 
+        public DateTime? DateOfBirth { get; set; }
+
         public string? Email { get; set; }
 
         public string? Phone { get; set; }

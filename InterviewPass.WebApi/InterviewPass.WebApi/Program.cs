@@ -8,6 +8,8 @@ using JsonSubTypes;
 using InterviewPass.WebApi.Models.User;
 using InterviewPass.WebApi.Mapper;
 using InterviewPass.WebApi.Enums;
+using Swashbuckle.AspNetCore.Filters;
+using InterviewPass.WebApi.Examples;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +33,10 @@ builder.Services.AddSwaggerGen(options =>
 {
     // Automatically include XML comments from the assembly
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
+    // Enable support for examples
+    options.ExampleFilters();
 });
+builder.Services.AddSwaggerExamplesFromAssemblyOf<UserExampleDocumentation>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 //Dependency injection
@@ -52,12 +57,11 @@ builder.Services.AddTransient<Func<string, IUserRepository>>(serviceProvider => 
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
+//builder.WebHost.UseUrls("http://*:1302");
+
 
 app.UseHttpsRedirection();
 

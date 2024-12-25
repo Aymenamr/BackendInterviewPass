@@ -2,10 +2,12 @@
 using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.WebApi.Enums;
+using InterviewPass.WebApi.Examples;
 using InterviewPass.WebApi.Extensions;
 using InterviewPass.WebApi.Mapper;
 using InterviewPass.WebApi.Models.User;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Filters;
 using System;
 
 
@@ -108,6 +110,8 @@ namespace InterviewPass.WebApi.Controllers
         /// <response code="500">If there is an error retrieving the data.</response>
         // POST api/<UserController>
         [HttpPost]
+        [SwaggerRequestExample(typeof(UserJobSeekerModel), typeof(UserExampleDocumentation))]
+
         public IActionResult Post([FromBody] UserModel user)
         {
             User userEntity = user.GetUserEntiy(_mapper);
