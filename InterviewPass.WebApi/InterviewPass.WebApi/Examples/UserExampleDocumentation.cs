@@ -11,14 +11,14 @@ namespace InterviewPass.WebApi.Examples
                 "JobSeeker Example",
                 new UserJobSeekerModel()
                 {
-                    DateOfBirth = DateTime.Parse("22-10-1965"),
-                     Email="test@gmail.com",
+                    DateOfBirth = DateTime.ParseExact("22-10-1965", "dd-MM-yyyy", System.Globalization.CultureInfo.InvariantCulture),            Email = "test@gmail.com",
                      LevelOfExperience=10,
                      Login="test1",
                      Name="first name",
                      PasswordHash= "3cdbe355f60f1b4d04496cfe9879ab62851b58ab",
                      UserType="JobSeeker",
-                     Phone="12344"
+                     Phone="12344",
+                     SkillIds=new List<string> { "8e3c91b1-8e64-4f25-8f1b-8b7dde99cbf4" }
 
                 });
         }

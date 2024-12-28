@@ -111,11 +111,11 @@ namespace InterviewPass.WebApi.Controllers
         // POST api/<UserController>
         [HttpPost]
         [SwaggerRequestExample(typeof(UserJobSeekerModel), typeof(UserExampleDocumentation))]
-
+        [ProducesResponseType(typeof(UserJobSeekerModel), StatusCodes.Status201Created)]
         public IActionResult Post([FromBody] UserModel user)
         {
             User userEntity = user.GetUserEntiy(_mapper);
-            if (_userRepoResolver(user.UserType).GetUser(user.Name) == null)
+            if (_userRepoResolver(user.UserType).GetUser(user.Login) == null)
             {
                 _userRepoResolver(user.UserType).AddUser(userEntity);
             }
