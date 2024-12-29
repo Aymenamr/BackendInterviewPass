@@ -1,11 +1,13 @@
+using InterviewPass.DataAccess.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace InterviewPass.DataAccess.Repositories
 {
-    public class GenericRepository<T> where T : class
+    public class GenericRepository<T>: IGenericRepository<T> where T : class 
     {
         private readonly DbContext _dbContext;
         private readonly DbSet<T> _dbSet;
@@ -34,9 +36,17 @@ namespace InterviewPass.DataAccess.Repositories
             _dbContext.SaveChanges();
         }
 
-        public T GetByField(Func<T, bool> predicate)
+        public T GetByProperty(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
         {
-            return _dbSet.FirstOrDefault(predicate);
+            IQueryable<T> query = _dbSet;
+
+            // Apply the Include expressions (if any)
+            foreach (var include in includes)
+            {
+                query = query.Include(include); // Apply eager loading
+            }
+
+            return query.FirstOrDefault(predicate); // Apply the condition and return the entity
         }
 
         public List<T> GetAll()

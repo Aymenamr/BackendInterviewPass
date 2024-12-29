@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using InterviewPass.DataAccess.Entities;
+using InterviewPass.DataAccess.Repositories;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.WebApi.Models;
 using Microsoft.AspNetCore.Http;
@@ -12,10 +13,10 @@ namespace InterviewPass.WebApi.Controllers
     public class ExamController : ControllerBase
     {
         private readonly ILogger<ExamController> _logger;
-        private readonly IExamRepository _examRepository;
+        private readonly IGenericRepository<Exam> _examRepository;
         private readonly IMapper _mapper;
 
-        public ExamController(ILogger<ExamController> logger,IExamRepository examRepository, IMapper mapper)
+        public ExamController(ILogger<ExamController> logger, IGenericRepository<Exam> examRepository, IMapper mapper)
         {
             _logger = logger;
             _examRepository = examRepository;
@@ -25,14 +26,14 @@ namespace InterviewPass.WebApi.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_mapper.Map<List<ExamModel>>(_examRepository.RetrieveAll()));
+            return Ok(_mapper.Map<List<ExamModel>>(_examRepository.GetAll()));
         }
 
         // GET api/<ExamController>/5
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
-            var examEntity = _examRepository.RetrieveExam(id);
+            var examEntity = _examRepository.GetByProperty(exam => exam.Id==id);
             if(examEntity == null) 
             { 
                 return NotFound("Exam not found"); 
@@ -45,11 +46,11 @@ namespace InterviewPass.WebApi.Controllers
         public IActionResult Post([FromBody] ExamModel exam)
         {
             Exam examEntity = _mapper.Map<Exam>(exam);
-            if (_examRepository.RetrieveExamByName(exam.Name) != null)
+            if (_examRepository.GetByProperty(e => e.Name == exam.Name) != null)
             {
                 return Conflict("The Exam name already Exists !");
             }
-            _examRepository.AddExam(examEntity);
+            _examRepository.Add(examEntity);
             return CreatedAtAction(nameof(Post), new { id = examEntity.Id }, exam);
         }
 
@@ -58,7 +59,7 @@ namespace InterviewPass.WebApi.Controllers
         [HttpDelete("{id}")]
         public void Delete(string id)
         {
-            _examRepository.DeleteExam(id);
+            _examRepository.Delete(_examRepository.GetByProperty(e => e.Id==id));
         }
     }
 }

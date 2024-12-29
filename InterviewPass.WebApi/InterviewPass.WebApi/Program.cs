@@ -10,6 +10,7 @@ using InterviewPass.WebApi.Mapper;
 using InterviewPass.WebApi.Enums;
 using Swashbuckle.AspNetCore.Filters;
 using InterviewPass.WebApi.Examples;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +42,7 @@ builder.Services.AddSwaggerExamplesFromAssemblyOf<UserExampleDocumentation>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 //Dependency injection
 builder.Services.AddTransient<DbContext, InterviewPassContext>();
-builder.Services.AddTransient<IExamRepository, ExamRepository>();
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddTransient<JobSeekerRepository>();
 builder.Services.AddTransient<HrRepository>();
 builder.Services.AddTransient<Func<string, IUserRepository>>(serviceProvider => key =>
@@ -53,7 +54,6 @@ builder.Services.AddTransient<Func<string, IUserRepository>>(serviceProvider => 
         _ => throw new KeyNotFoundException("Service not found.")
     };
 });
-
 
 var app = builder.Build();
 
