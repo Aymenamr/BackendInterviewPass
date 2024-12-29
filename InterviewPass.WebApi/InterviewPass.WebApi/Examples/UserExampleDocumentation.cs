@@ -1,4 +1,6 @@
-﻿using InterviewPass.WebApi.Models.User;
+﻿using InterviewPass.DataAccess.Entities;
+using InterviewPass.WebApi.Models;
+using InterviewPass.WebApi.Models.User;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace InterviewPass.WebApi.Examples
@@ -18,7 +20,7 @@ namespace InterviewPass.WebApi.Examples
                      PasswordHash= "3cdbe355f60f1b4d04496cfe9879ab62851b58ab",
                      UserType="JobSeeker",
                      Phone="12344",
-                     SkillIds=new List<string> { "8e3c91b1-8e64-4f25-8f1b-8b7dde99cbf4" }
+                     Skills=new List<SkillModel> { new SkillModel { Id = "8e3c91b1-8e64-4f25-8f1b-8b7dde99cbf4" } }
 
                 });
         }

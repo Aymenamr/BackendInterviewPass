@@ -3,7 +3,8 @@
     public class UserJobSeekerModel : UserModel
     {        
         public int LevelOfExperience { get; set; }
-        public List<string> SkillIds { get; set; }
+        //Exercice 05 Correction
+        public List<SkillModel>? Skills { get; set; }
 
     }
 }

@@ -29,12 +29,13 @@ namespace InterviewPass.DataAccess.Services
 
         public User GetUser(string login)
         {
-            return _dbContext.UserJobSeekers.FirstOrDefault(x => x.Login == login);
+            //Exercice 05 Correction
+            return _dbContext.UserJobSeekers.Include(user => user.SkillBySeekers).ThenInclude(sbs => sbs.Skill).FirstOrDefault(user => user.Login == login);
         }
 
         public List<User> GetUsers()
         {
-            List<User> seekers = [.. _dbContext.UserJobSeekers.ToList()];
+            List<User> seekers = [.. _dbContext.UserJobSeekers.Include(user => user.SkillBySeekers).ThenInclude(sbs => sbs.Skill).ToList()];
             return seekers;
         }
     }

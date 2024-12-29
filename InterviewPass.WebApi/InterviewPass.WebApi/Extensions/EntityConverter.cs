@@ -5,19 +5,20 @@ using InterviewPass.WebApi.Models.User;
 namespace InterviewPass.WebApi.Extensions
 {
     public static class EntityConverter
-    {    
+    {   
+        //aamri : Check the updates done on this Method
         public static User GetUserEntiy(this UserModel model,IMapper mapper)
         {
-            User userEntity = null;
             if (model is UserJobSeekerModel Jsker)
             {
-                userEntity = mapper.Map<UserJobSeeker>(Jsker);
+                return mapper.Map<UserJobSeeker>(Jsker);              
+            
             }
             else if (model is UserHrModel hr)
             {
-                userEntity = mapper.Map<UserHr>(hr);
+                return mapper.Map<UserHr>(hr);
             }
-            return userEntity;
+            return null;
         }
     }
 }

@@ -7,7 +7,7 @@ public partial class SkillBySeeker
 {
     public int Id { get; set; }
 
-    public int? SkillId { get; set; }
+    public string? SkillId { get; set; }
 
     public string? JobSeekerId { get; set; }
 
