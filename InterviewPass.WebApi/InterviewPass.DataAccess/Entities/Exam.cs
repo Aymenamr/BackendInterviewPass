@@ -19,8 +19,9 @@ public partial class Exam
 
     public string? CreatedBy { get; set; }
 
-
     public int? NbrOfQuestion { get; set; }
+
+    public DateTime? CreationDate { get; set; }
 
     public virtual ICollection<Answer> Answers { get; set; } = new List<Answer>();
 

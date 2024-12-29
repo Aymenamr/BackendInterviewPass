@@ -219,7 +219,6 @@ public partial class InterviewPassContext : DbContext
             entity.HasIndex(e => e.Name, "IX_UserJobSeeker_Name").IsUnique();
 
             entity.Property(e => e.Id).HasColumnType("STRING");
-            entity.Property(e => e.DateOfBirth).HasColumnType("DATETIME");
             entity.Property(e => e.Email).HasColumnType("STRING");
             entity.Property(e => e.Login).HasColumnType("STRING");
             entity.Property(e => e.Name).HasColumnType("STRING");

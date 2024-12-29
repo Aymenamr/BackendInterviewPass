@@ -97,14 +97,18 @@ namespace InterviewPass.WebApi.Controllers
         [HttpDelete("{name}")]
         public IActionResult Delete(string name)
         {
-            var skill = _skillRepository.GetByProperty(skill => skill.Name == name, skill=>skill.SkillBySeekers);
+            var skill = _skillRepository.GetByProperty(skill => skill.Name == name, skill => skill.SkillBySeekers,skill=>skill.Questions) ;
             if (skill == null)
             {
                 return NotFound("Skill not found");
             }
             else if (skill.SkillBySeekers!=null && skill.SkillBySeekers.Count > 0)
             {
-                return Conflict("The skill is used in some skills or exams");
+                return Conflict("Cannot delete the skill, it is affected to users");
+            }
+            else if (skill.Questions != null && skill.Questions.Count > 0)
+            {
+                return Conflict("Cannot delete the skill, it is affected to Questions");
             }
 
             _skillRepository.Delete(skill);
