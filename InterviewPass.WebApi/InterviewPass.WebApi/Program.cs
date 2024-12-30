@@ -42,7 +42,7 @@ builder.Services.AddSwaggerExamplesFromAssemblyOf<UserExampleDocumentation>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 //Dependency injection
 builder.Services.AddTransient<DbContext, InterviewPassContext>();
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddTransient<JobSeekerRepository>();
 builder.Services.AddTransient<HrRepository>();
 builder.Services.AddTransient<Func<string, IUserRepository>>(serviceProvider => key =>
