@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace InterviewPass.DataAccess.Repositories
 {
@@ -20,6 +21,7 @@ namespace InterviewPass.DataAccess.Repositories
 
         public void Add(T entity)
         {
+            AssignGuidIfNeeded(entity);
             _dbSet.Add(entity);
             _dbContext.SaveChanges();
         }
@@ -52,6 +54,21 @@ namespace InterviewPass.DataAccess.Repositories
         public List<T> GetAll()
         {
             return _dbSet.ToList();
+        }
+
+        private void AssignGuidIfNeeded(T entity)
+        {
+            var type = typeof(T);
+            var idProperty = type.GetProperty("Id", BindingFlags.Public | BindingFlags.Instance);
+
+            if (idProperty != null && idProperty.PropertyType == typeof(string))
+            {
+                var currentValue = idProperty.GetValue(entity) as string;
+                if (string.IsNullOrWhiteSpace(currentValue))
+                {
+                    idProperty.SetValue(entity, Guid.NewGuid().ToString());
+                }
+            }
         }
     }
 }
