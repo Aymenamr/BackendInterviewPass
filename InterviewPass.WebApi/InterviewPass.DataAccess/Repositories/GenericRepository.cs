@@ -63,11 +63,7 @@ namespace InterviewPass.DataAccess.Repositories
 
             if (idProperty != null && idProperty.PropertyType == typeof(string))
             {
-                var currentValue = idProperty.GetValue(entity) as string;
-                if (string.IsNullOrWhiteSpace(currentValue))
-                {
-                    idProperty.SetValue(entity, Guid.NewGuid().ToString());
-                }
+                idProperty.SetValue(entity, Guid.NewGuid().ToString());                
             }
         }
     }

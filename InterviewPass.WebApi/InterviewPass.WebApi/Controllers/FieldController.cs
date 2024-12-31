@@ -65,18 +65,18 @@ namespace InterviewPass.WebApi.Controllers
         /// <response code="500">If there is an error retrieving the data.</response>
         // POST api/<FieldController>
         [HttpPost]
-        public IActionResult Post([FromBody] FieldModel field)
+        public IActionResult Post([FromBody] FieldModel fieldmodel)
         {
 
 
-            var fieldEntity = _mapper.Map<Field>(field);
-            if (_fieldRepository.GetByProperty(field => field.Name == field.Name) != null)
+            var fieldEntity = _mapper.Map<Field>(fieldmodel);
+            if (_fieldRepository.GetByProperty(field => field.Name == fieldmodel.Name) != null)
             {
                 return Conflict("The Field name already Exists !");
             }
             _fieldRepository.Add(fieldEntity);
-            field.Id = fieldEntity.Id;
-            return CreatedAtAction(nameof(Get), new { name = fieldEntity.Name }, field);
+            fieldmodel.Id = fieldEntity.Id;
+            return CreatedAtAction(nameof(Get), new { name = fieldEntity.Name }, fieldmodel);
         }
 
         /// <summary>
