@@ -18,6 +18,7 @@ namespace InterviewPass.DataAccess.Services
             seeker.Id = Guid.NewGuid().ToString();
             _dbContext.UserJobSeekers.Add(seeker);
             _dbContext.SaveChanges();
+            user = GetUser(user.Login); // update the user entity object with the skills info
         }
 
         public void DeleteUser(string id)

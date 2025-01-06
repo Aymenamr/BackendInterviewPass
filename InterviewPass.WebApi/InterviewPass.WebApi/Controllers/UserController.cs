@@ -115,14 +115,16 @@ namespace InterviewPass.WebApi.Controllers
         public IActionResult Post([FromBody] UserModel user)
         {
             User userEntity = user.GetUserEntiy(_mapper);
-            if (_userRepoResolver(user.UserType).GetUser(user.Login) == null)
+            UserType userType = (user is UserJobSeekerModel) ? UserType.JobSeeker : UserType.Hr;
+            if (_userRepoResolver(userType.ToString()).GetUser(user.Login) == null)
             {
-                _userRepoResolver(user.UserType).AddUser(userEntity);
+                _userRepoResolver(userType.ToString()).AddUser(userEntity);
             }
             else
             {
                 return Conflict("The Login already Exists !");
             }
+            user = userEntity.GetUserModel(_mapper);
             return CreatedAtAction(nameof(Post), new { id = userEntity.Id }, user);
         }
         

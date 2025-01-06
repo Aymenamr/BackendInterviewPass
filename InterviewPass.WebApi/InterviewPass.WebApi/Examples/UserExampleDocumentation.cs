@@ -18,7 +18,6 @@ namespace InterviewPass.WebApi.Examples
                      Login="test1",
                      Name="first name",
                      PasswordHash= "3cdbe355f60f1b4d04496cfe9879ab62851b58ab",
-                     UserType="JobSeeker",
                      Phone="12344",
                      Skills=new List<SkillModel> { new SkillModel { Id = "8e3c91b1-8e64-4f25-8f1b-8b7dde99cbf4" } }
 
