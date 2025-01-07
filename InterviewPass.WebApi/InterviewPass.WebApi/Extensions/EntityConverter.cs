@@ -20,5 +20,19 @@ namespace InterviewPass.WebApi.Extensions
             }
             return null;
         }
+        
+        public static UserModel GetUserModel(this User entity, IMapper mapper)
+        {
+            if (entity is UserJobSeeker Jsker)
+            {
+                return mapper.Map<UserJobSeekerModel>(Jsker);
+            }
+            else if (entity is UserHr hr)
+            {
+                return mapper.Map<UserHrModel>(hr);
+            }
+            return null;
+        }
     }
+
 }
