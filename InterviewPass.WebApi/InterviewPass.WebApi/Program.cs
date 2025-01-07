@@ -11,20 +11,21 @@ using InterviewPass.WebApi.Enums;
 using Swashbuckle.AspNetCore.Filters;
 using InterviewPass.WebApi.Examples;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
-//and define the device Discriminator
-options.SerializerSettings.Converters.Add(
-    JsonSubtypesConverterBuilder
-    .Of(typeof(UserModel), "UserType")
-    .RegisterSubtype(typeof(UserJobSeekerModel), UserType.JobSeeker)
-    .RegisterSubtype(typeof(UserHrModel),UserType.Hr)
-    .SerializeDiscriminatorProperty()
-    .Build());
+    //and define the device Discriminator
+    options.SerializerSettings.Converters.Add(
+        JsonSubtypesConverterBuilder
+        .Of(typeof(UserModel), "UserType")
+        .RegisterSubtype(typeof(UserJobSeekerModel), UserType.JobSeeker)
+        .RegisterSubtype(typeof(UserHrModel), UserType.Hr)
+        .SerializeDiscriminatorProperty()
+        .Build());
 
 });
 
@@ -40,6 +41,17 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddSwaggerExamplesFromAssemblyOf<UserExampleDocumentation>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+// Configure Serilog
+builder.Host.UseSerilog((context, loggerConfiguration) =>
+{
+    loggerConfiguration
+        .ReadFrom.Configuration(context.Configuration) // Read settings from appsettings.json
+        .Enrich.FromLogContext()
+        .WriteTo.Console()
+        .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day);
+});
+
 //Dependency injection
 builder.Services.AddTransient<DbContext, InterviewPassContext>();
 builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -61,6 +73,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 //builder.WebHost.UseUrls("http://*:1302");
+app.UseSerilogRequestLogging();
 
 
 app.UseHttpsRedirection();
