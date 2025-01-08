@@ -22,7 +22,7 @@ namespace InterviewPass.WebApi.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly Func<string, IUserRepository> _userRepoResolver;
 
-        
+
         private readonly IMapper _mapper;
         public UserController(ILogger<UserController> logger, Func<string, IUserRepository> userRepoResolver, IMapper mapper)
         {
@@ -30,7 +30,7 @@ namespace InterviewPass.WebApi.Controllers
             _userRepoResolver = userRepoResolver;
             _mapper = mapper;
         }
-      
+
         /// <summary>
         /// Retrieve a User according to his Id
         /// </summary>
@@ -41,13 +41,14 @@ namespace InterviewPass.WebApi.Controllers
         /// <response code="500">Internal Server Error.</response>
         // GET api/<UserController>/user1
         [HttpGet("{login}")]
-        public IActionResult Get(string login,UserType userType)
+        public IActionResult Get(string login, UserType userType)
         {
+
             // Retrieve the user from the repository
             var user = _userRepoResolver(userType.ToString()).GetUser(login);
-            
-            if(user == null)
-            { 
+
+            if (user == null)
+            {
                 return NotFound("The requested user was not found");
             }
 
@@ -67,7 +68,8 @@ namespace InterviewPass.WebApi.Controllers
                 default:
                     return BadRequest("Bad User type");
 
-            }        
+            }
+
         }
 
         // GET: api/<UserController
@@ -80,9 +82,10 @@ namespace InterviewPass.WebApi.Controllers
         [HttpGet("users")]
         public IActionResult GetUsers(UserType userType)
         {
+            _logger.LogInformation("Get method start");
             // Retrieve users from the repository
             var users = _userRepoResolver(userType.ToString()).GetUsers();
-            switch(userType)
+            switch (userType)
             {
                 case UserType.JobSeeker:
                     {
@@ -99,14 +102,14 @@ namespace InterviewPass.WebApi.Controllers
                     return BadRequest("Bad User type");
 
             }
-       }
+        }
         /// <summary>
         /// Add a new user to the database
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-       /// <response code="201">The user was successfully created.</response>
-       /// <response code="400">The user introduced has bad data format.</response>
+        /// <response code="201">The user was successfully created.</response>
+        /// <response code="400">The user introduced has bad data format.</response>
         /// <response code="500">If there is an error retrieving the data.</response>
         // POST api/<UserController>
         [HttpPost]
@@ -127,11 +130,11 @@ namespace InterviewPass.WebApi.Controllers
             user = userEntity.GetUserModel(_mapper);
             return CreatedAtAction(nameof(Post), new { id = userEntity.Id }, user);
         }
-        
+
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(string id,UserType type)
+        public IActionResult Delete(string id, UserType type)
         {
             _userRepoResolver(type.ToString()).DeleteUser(id);
             return Ok();
