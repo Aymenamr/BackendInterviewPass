@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using InterviewPass.DataAccess.Entities;
+using InterviewPass.DataAccess.Entities.Questions;
 using InterviewPass.WebApi.Models;
 using InterviewPass.WebApi.Models.User;
+using InterviewPass.WebApi.Models.Question;
 
 namespace InterviewPass.WebApi.Mapper
 {
@@ -22,6 +24,11 @@ namespace InterviewPass.WebApi.Mapper
             CreateMap<Exam, ExamModel>().ReverseMap(); ;
             CreateMap<Field, FieldModel>().ReverseMap(); ;
             CreateMap<Skill, SkillModel>().ReverseMap();
+            CreateMap<MultipleChoiceQuestion, MultipleChoiceQuestionModel>().ReverseMap();
+            CreateMap<TrueFalseQuestion, TrueFalseQuestionModel>().ReverseMap();
+            CreateMap<PracticalQuestion, PracticalQuestionModel>().ReverseMap();
+            CreateMap<ObjectiveQuestion, ObjectiveQuestionModel>().ReverseMap();
+            CreateMap<Possibility, PossibilityModel>().ReverseMap();
         }
     }
 }
