@@ -45,11 +45,10 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 // Configure Serilog
 builder.Host.UseSerilog((context, loggerConfiguration) =>
 {
+
     loggerConfiguration
-        .ReadFrom.Configuration(context.Configuration) // Read settings from appsettings.json
-        .Enrich.FromLogContext()
-        .WriteTo.Console()
-        .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day);
+    .ReadFrom.Configuration(context.Configuration) // Read settings from appsettings.json
+    .Enrich.FromLogContext();
 });
 
 //Dependency injection
