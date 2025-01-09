@@ -2,6 +2,13 @@
 
 namespace InterviewPass.WebApi.Enums
 {
+    /// <summary>
+    /// Enumeration to specify the question type
+    /// Multiple choice question = 0
+    /// True or False question = 1
+    /// Practical question =2
+    /// Objective question =3
+    /// </summary>
     public enum QuestionType
     {
         MultipleChoice = 0,

@@ -1,6 +1,6 @@
 ﻿namespace InterviewPass.WebApi.Models.Question
 {
-    public class PracticalQuestionModel
+    public class PracticalQuestionModel : QuestionModel
     {
     }
 }

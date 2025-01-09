@@ -24,6 +24,6 @@ namespace InterviewPass.WebApi.Models
         [Required]
         public short NbrOfQuestion { get; set; }
 
-        public List<QuestionModel> Questions {  get; set; }
+        public List<QuestionModel>? Questions {  get; set; }
     }
 }

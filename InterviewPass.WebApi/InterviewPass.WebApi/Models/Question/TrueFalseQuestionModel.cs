@@ -2,7 +2,7 @@
 
 namespace InterviewPass.WebApi.Models.Question
 {
-    public class TrueFalseQuestionModel
+    public class TrueFalseQuestionModel : QuestionModel
     {
         [Required]
         public bool? IsTrue { get; set; }

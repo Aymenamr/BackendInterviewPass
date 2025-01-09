@@ -12,6 +12,7 @@ using Swashbuckle.AspNetCore.Filters;
 using InterviewPass.WebApi.Examples;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using InterviewPass.WebApi.Models.Question;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +28,18 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
         .SerializeDiscriminatorProperty()
         .Build());
 
-});
+}).AddNewtonsoftJson(options =>
+        {
+            options.SerializerSettings.Converters.Add(
+                JsonSubtypesConverterBuilder
+                    .Of(typeof(Question), "QuestionType")
+                    .RegisterSubtype(typeof(MultipleChoiceQuestionModel), "MultipleChoice")
+                    .RegisterSubtype(typeof(TrueFalseQuestionModel), "TrueFalse")
+                    .RegisterSubtype(typeof(PracticalQuestionModel), "Practical")
+                    .RegisterSubtype(typeof(ObjectiveQuestionModel), "Objective")
+                    .SerializeDiscriminatorProperty()
+                    .Build());
+        });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -39,6 +51,7 @@ builder.Services.AddSwaggerGen(options =>
     options.ExampleFilters();
 });
 builder.Services.AddSwaggerExamplesFromAssemblyOf<UserExampleDocumentation>();
+builder.Services.AddSwaggerExamplesFromAssemblyOf<ExamExampleDocumentation>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 

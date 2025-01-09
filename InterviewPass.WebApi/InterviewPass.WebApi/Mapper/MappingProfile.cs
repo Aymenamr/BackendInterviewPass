@@ -20,9 +20,9 @@ namespace InterviewPass.WebApi.Mapper
                .ForMember(destinationModel => destinationModel.Skills,
                          opt => opt.MapFrom(sourceEntity => sourceEntity.SkillBySeekers.Select(skillBySeeker => new SkillModel { Id = skillBySeeker.SkillId, Name = skillBySeeker.Skill.Name,FieldId=skillBySeeker.Skill.FieldId }).ToList()));
 
-            CreateMap<UserHrModel, UserHr>().ReverseMap(); ;
+            CreateMap<UserHrModel, UserHr>().ReverseMap();
             CreateMap<Exam, ExamModel>().ReverseMap(); ;
-            CreateMap<Field, FieldModel>().ReverseMap(); ;
+            CreateMap<Field, FieldModel>().ReverseMap();
             CreateMap<Skill, SkillModel>().ReverseMap();
             CreateMap<MultipleChoiceQuestion, MultipleChoiceQuestionModel>().ReverseMap();
             CreateMap<TrueFalseQuestion, TrueFalseQuestionModel>().ReverseMap();

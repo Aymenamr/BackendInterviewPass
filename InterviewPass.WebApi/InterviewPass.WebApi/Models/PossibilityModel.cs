@@ -4,7 +4,7 @@ namespace InterviewPass.WebApi.Models
 {
     public class PossibilityModel
     {
-        public string Id { get; set; } = null!;
+        public string? Id { get; set; } = null!;
 
         public string? QuestionId { get; set; }
 

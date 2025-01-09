@@ -3,8 +3,14 @@ using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.WebApi.Models;
+using InterviewPass.WebApi.Models.Question;
+using InterviewPass.WebApi.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using InterviewPass.WebApi.Examples;
+using InterviewPass.WebApi.Models.User;
+using Swashbuckle.AspNetCore.Filters;
+using InterviewPass.WebApi.Extensions;
 
 namespace InterviewPass.WebApi.Controllers
 {
@@ -14,12 +20,16 @@ namespace InterviewPass.WebApi.Controllers
     {
         private readonly ILogger<ExamController> _logger;
         private readonly IGenericRepository<Exam> _examRepository;
+        private readonly IGenericRepository<Question> _questionRepository;
+        private readonly IGenericRepository<Possibility> _possibilityRepository;
         private readonly IMapper _mapper;
 
-        public ExamController(ILogger<ExamController> logger, IGenericRepository<Exam> examRepository, IMapper mapper)
+        public ExamController(ILogger<ExamController> logger, IGenericRepository<Exam> examRepository, IGenericRepository<Question> questionRepository, IGenericRepository<Possibility> possibilityRepository, IMapper mapper)
         {
             _logger = logger;
             _examRepository = examRepository;
+            _possibilityRepository = possibilityRepository;
+            _questionRepository = questionRepository;
             _mapper = mapper;
         }
         // GET: api/<ExamController>
@@ -43,6 +53,7 @@ namespace InterviewPass.WebApi.Controllers
 
         // POST api/<ExamController>
         [HttpPost]
+        [SwaggerRequestExample(typeof(ExamModel), typeof(ExamExampleDocumentation))]
         public IActionResult Post([FromBody] ExamModel exam)
         {
             Exam examEntity = _mapper.Map<Exam>(exam);
@@ -51,6 +62,23 @@ namespace InterviewPass.WebApi.Controllers
                 return Conflict("The Exam name already Exists !");
             }
             _examRepository.Add(examEntity);
+
+            foreach (var question in exam.Questions) // always get the questions as QuestionModel not derived QuestionModels
+            {
+                var questionEntity = question.GetQuestionEntiy(_mapper);
+                questionEntity.QuestionExams.Add(new QuestionExam { IdExam = examEntity.Id });
+                _questionRepository.Add(questionEntity);
+                if (question is MultipleChoiceQuestionModel mcq)
+                {
+                    foreach (var possibility in mcq.Possibilities)
+                    {
+                        var possibilityEntity = _mapper.Map<Possibility>(possibility);
+                        possibilityEntity.QuestionId = questionEntity.Id;
+                        _possibilityRepository.Add(possibilityEntity);
+                    }
+                }
+            }
+
             return CreatedAtAction(nameof(Post), new { id = examEntity.Id }, exam);
         }
 
