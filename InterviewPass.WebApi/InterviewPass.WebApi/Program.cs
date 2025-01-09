@@ -12,6 +12,7 @@ using Swashbuckle.AspNetCore.Filters;
 using InterviewPass.WebApi.Examples;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using InterviewPass.WebApi.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -78,7 +79,7 @@ app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
+app.UseExceptionHandler(opts => opts.UseMiddleware<ExceptionHandler>());
 app.MapControllers();
 
 app.Run();

@@ -2,6 +2,7 @@
 using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories;
 using InterviewPass.DataAccess.Repositories.Interfaces;
+using InterviewPass.WebApi.Exceptions;
 using InterviewPass.WebApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -33,12 +34,13 @@ namespace InterviewPass.WebApi.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
-            var examEntity = _examRepository.GetByProperty(exam => exam.Id==id);
-            if(examEntity == null) 
-            { 
-                return NotFound("Exam not found"); 
+            var examEntity = _examRepository.GetByProperty(exam => exam.Id == id);
+            if (examEntity == null)
+            {
+                //return NotFound("Exam not found"); 
+                throw new EntityNotFoundException();
             }
-            return Ok(_mapper.Map<Exam>(examEntity)) ;
+            return Ok(_mapper.Map<Exam>(examEntity));
         }
 
         // POST api/<ExamController>
@@ -48,7 +50,8 @@ namespace InterviewPass.WebApi.Controllers
             Exam examEntity = _mapper.Map<Exam>(exam);
             if (_examRepository.GetByProperty(e => e.Name == exam.Name) != null)
             {
-                return Conflict("The Exam name already Exists !");
+                //return Conflict("The Exam name already Exists !");
+                throw new Duplicate();
             }
             _examRepository.Add(examEntity);
             return CreatedAtAction(nameof(Post), new { id = examEntity.Id }, exam);
@@ -59,7 +62,7 @@ namespace InterviewPass.WebApi.Controllers
         [HttpDelete("{id}")]
         public void Delete(string id)
         {
-            _examRepository.Delete(_examRepository.GetByProperty(e => e.Id==id));
+            _examRepository.Delete(_examRepository.GetByProperty(e => e.Id == id));
         }
     }
 }

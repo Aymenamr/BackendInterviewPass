@@ -4,6 +4,7 @@ using InterviewPass.DataAccess.Repositories;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using AutoMapper;
 using InterviewPass.WebApi.Models;
+using InterviewPass.WebApi.Exceptions;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -52,7 +53,8 @@ namespace InterviewPass.WebApi.Controllers
         {
             var skill = _skillRepository.GetByProperty(skill => skill.Name == name);
             if (skill == null)
-                return NotFound("Skill not found");
+                //return NotFound("Skill not found");
+                throw new EntityNotFoundException();
             return Ok(_mapper.Map<SkillModel>(skill));
         }
 
@@ -69,15 +71,16 @@ namespace InterviewPass.WebApi.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] SkillModel skill)
         {
-            if (string.IsNullOrEmpty(skill.Name) ||string.IsNullOrWhiteSpace(skill.FieldId))
+            if (string.IsNullOrEmpty(skill.Name) || string.IsNullOrWhiteSpace(skill.FieldId))
                 return BadRequest("Name or FieldId cannot be null");
-           
+
             var skillEntity = _mapper.Map<Skill>(skill);
-           
+
             if (_skillRepository.GetByProperty(sk => sk.Name == skill.Name) != null)
-                return Conflict("Skill already exists");
-           
-     
+                //return Conflict("Skill already exists");
+                throw new Duplicate();
+
+
             _skillRepository.Add(skillEntity);
             skill.Id = skillEntity.Id;
             return CreatedAtAction(nameof(Get), new { name = skillEntity.Name }, skill);
@@ -97,12 +100,13 @@ namespace InterviewPass.WebApi.Controllers
         [HttpDelete("{name}")]
         public IActionResult Delete(string name)
         {
-            var skill = _skillRepository.GetByProperty(skill => skill.Name == name, skill => skill.SkillBySeekers,skill=>skill.Questions) ;
+            var skill = _skillRepository.GetByProperty(skill => skill.Name == name, skill => skill.SkillBySeekers, skill => skill.Questions);
             if (skill == null)
             {
-                return NotFound("Skill not found");
+                //return NotFound("Skill not found");
+                throw new EntityNotFoundException();
             }
-            else if (skill.SkillBySeekers!=null && skill.SkillBySeekers.Count > 0)
+            else if (skill.SkillBySeekers != null && skill.SkillBySeekers.Count > 0)
             {
                 return Conflict("Cannot delete the skill, it is affected to users");
             }
