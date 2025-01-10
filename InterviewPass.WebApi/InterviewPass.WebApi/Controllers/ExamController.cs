@@ -69,6 +69,7 @@ namespace InterviewPass.WebApi.Controllers
             //    examEntity.QuestionExams.Add(new QuestionExam { IdQuestionNavigation = questionEntity });
             //}
             _examRepository.Add(examEntity);
+            exam.Questions = [];
             exam = _mapper.Map<ExamModel>(examEntity);
             return CreatedAtAction(nameof(Post), new { id = examEntity.Id }, exam);
         }
