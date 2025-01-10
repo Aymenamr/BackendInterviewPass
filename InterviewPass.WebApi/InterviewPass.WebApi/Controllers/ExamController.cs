@@ -20,16 +20,12 @@ namespace InterviewPass.WebApi.Controllers
     {
         private readonly ILogger<ExamController> _logger;
         private readonly IGenericRepository<Exam> _examRepository;
-        private readonly IGenericRepository<Question> _questionRepository;
-        private readonly IGenericRepository<Possibility> _possibilityRepository;
         private readonly IMapper _mapper;
 
-        public ExamController(ILogger<ExamController> logger, IGenericRepository<Exam> examRepository, IGenericRepository<Question> questionRepository, IGenericRepository<Possibility> possibilityRepository, IMapper mapper)
+        public ExamController(ILogger<ExamController> logger, IGenericRepository<Exam> examRepository, IMapper mapper)
         {
             _logger = logger;
             _examRepository = examRepository;
-            _possibilityRepository = possibilityRepository;
-            _questionRepository = questionRepository;
             _mapper = mapper;
         }
         // GET: api/<ExamController>
@@ -61,24 +57,21 @@ namespace InterviewPass.WebApi.Controllers
             {
                 return Conflict("The Exam name already Exists !");
             }
-            _examRepository.Add(examEntity);
-
-            foreach (var question in exam.Questions) // always get the questions as QuestionModel not derived QuestionModels
+            foreach (var question in exam.Questions)
             {
-                var questionEntity = question.GetQuestionEntiy(_mapper);
-                questionEntity.QuestionExams.Add(new QuestionExam { IdExam = examEntity.Id });
-                _questionRepository.Add(questionEntity);
                 if (question is MultipleChoiceQuestionModel mcq)
                 {
                     foreach (var possibility in mcq.Possibilities)
                     {
-                        var possibilityEntity = _mapper.Map<Possibility>(possibility);
-                        possibilityEntity.QuestionId = questionEntity.Id;
-                        _possibilityRepository.Add(possibilityEntity);
+                        possibility.Id = Guid.NewGuid().ToString();
                     }
                 }
+                var questionEntity = question.GetQuestionEntiy(_mapper);
+                questionEntity.Id = Guid.NewGuid().ToString();
+                examEntity.QuestionExams.Add(new QuestionExam { IdQuestionNavigation = questionEntity });
             }
-
+            _examRepository.Add(examEntity);
+            exam = _mapper.Map<ExamModel>(examEntity);
             return CreatedAtAction(nameof(Post), new { id = examEntity.Id }, exam);
         }
 

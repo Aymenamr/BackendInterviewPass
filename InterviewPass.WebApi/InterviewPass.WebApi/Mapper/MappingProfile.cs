@@ -4,7 +4,6 @@ using InterviewPass.DataAccess.Entities.Questions;
 using InterviewPass.WebApi.Models;
 using InterviewPass.WebApi.Models.User;
 using InterviewPass.WebApi.Models.Question;
-
 namespace InterviewPass.WebApi.Mapper
 {
     public class MappingProfile : Profile
@@ -21,7 +20,7 @@ namespace InterviewPass.WebApi.Mapper
                          opt => opt.MapFrom(sourceEntity => sourceEntity.SkillBySeekers.Select(skillBySeeker => new SkillModel { Id = skillBySeeker.SkillId, Name = skillBySeeker.Skill.Name,FieldId=skillBySeeker.Skill.FieldId }).ToList()));
 
             CreateMap<UserHrModel, UserHr>().ReverseMap();
-            CreateMap<Exam, ExamModel>().ReverseMap(); ;
+            CreateMap<ExamModel,Exam>().ReverseMap();
             CreateMap<Field, FieldModel>().ReverseMap();
             CreateMap<Skill, SkillModel>().ReverseMap();
             CreateMap<MultipleChoiceQuestion, MultipleChoiceQuestionModel>().ReverseMap();

@@ -12,6 +12,7 @@ namespace InterviewPass.WebApi.Models.Question
         public string? Content { get; set; }
         [Required]
         public double? Score { get; set; }
+        [Required]
         public string? SkillId { get; set; }
     }
 }

@@ -32,7 +32,7 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
         {
             options.SerializerSettings.Converters.Add(
                 JsonSubtypesConverterBuilder
-                    .Of(typeof(Question), "QuestionType")
+                    .Of(typeof(QuestionModel), "QuestionType")
                     .RegisterSubtype(typeof(MultipleChoiceQuestionModel), "MultipleChoice")
                     .RegisterSubtype(typeof(TrueFalseQuestionModel), "TrueFalse")
                     .RegisterSubtype(typeof(PracticalQuestionModel), "Practical")
