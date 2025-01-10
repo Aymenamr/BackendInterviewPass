@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace InterviewPass.DataAccess.Repositories
 {
-    public class GenericRepository<T>: IGenericRepository<T> where T : class 
+    public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         private readonly DbContext _dbContext;
         private readonly DbSet<T> _dbSet;
@@ -50,6 +50,17 @@ namespace InterviewPass.DataAccess.Repositories
 
             return query.FirstOrDefault(predicate); // Apply the condition and return the entity
         }
+        public T GetByPropertyWithQueryIncludes(Expression<Func<T, bool>> predicate, Func<IQueryable<T>, IQueryable<T>> includes = null)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (includes != null)
+            {
+                query = includes(query);
+            }
+
+            return query.FirstOrDefault(predicate);
+        }
 
         public List<T> GetAll()
         {
@@ -63,7 +74,7 @@ namespace InterviewPass.DataAccess.Repositories
 
             if (idProperty != null && idProperty.PropertyType == typeof(string))
             {
-                idProperty.SetValue(entity, Guid.NewGuid().ToString());                
+                idProperty.SetValue(entity, Guid.NewGuid().ToString());
             }
         }
     }

@@ -13,6 +13,7 @@ namespace InterviewPass.DataAccess.Repositories.Interfaces
         void Update(T entity);
         void Delete(T entity);
         T GetByProperty(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes);
+        T GetByPropertyWithQueryIncludes(Expression<Func<T, bool>> predicate, Func<IQueryable<T>, IQueryable<T>> includes = null);
         List<T> GetAll();
 
     }

@@ -20,7 +20,7 @@ namespace InterviewPass.WebApi.Examples
                     Id = Guid.NewGuid().ToString(),
                     Name = "C# exam",
                     Description = "test LINQ",
-                    Author = "Hr Name",
+                    Author = "424c8f15-3d56-4ad0-9869-25ba6cde3951",// hr user id
                     MinScore = 40,
                     MaxScore = 80,
                     DeadLineInNbrOfDays = 20,

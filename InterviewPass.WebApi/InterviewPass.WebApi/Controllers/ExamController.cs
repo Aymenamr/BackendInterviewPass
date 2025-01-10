@@ -3,14 +3,12 @@ using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.WebApi.Models;
-using InterviewPass.WebApi.Models.Question;
-using InterviewPass.WebApi.Enums;
-using Microsoft.AspNetCore.Http;
+using InterviewPass.DataAccess.Entities.Questions;
 using Microsoft.AspNetCore.Mvc;
 using InterviewPass.WebApi.Examples;
-using InterviewPass.WebApi.Models.User;
 using Swashbuckle.AspNetCore.Filters;
 using InterviewPass.WebApi.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace InterviewPass.WebApi.Controllers
 {
@@ -39,12 +37,12 @@ namespace InterviewPass.WebApi.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
-            var examEntity = _examRepository.GetByProperty(exam => exam.Id==id);
-            if(examEntity == null) 
-            { 
-                return NotFound("Exam not found"); 
+            var examEntity = _examRepository.GetByProperty(exam => exam.Id == id);
+            if (examEntity == null)
+            {
+                return NotFound("Exam not found");
             }
-            return Ok(_mapper.Map<Exam>(examEntity)) ;
+            return Ok(_mapper.Map<Exam>(examEntity));
         }
 
         // POST api/<ExamController>
@@ -57,19 +55,19 @@ namespace InterviewPass.WebApi.Controllers
             {
                 return Conflict("The Exam name already Exists !");
             }
-            foreach (var question in exam.Questions)
-            {
-                if (question is MultipleChoiceQuestionModel mcq)
-                {
-                    foreach (var possibility in mcq.Possibilities)
-                    {
-                        possibility.Id = Guid.NewGuid().ToString();
-                    }
-                }
-                var questionEntity = question.GetQuestionEntiy(_mapper);
-                questionEntity.Id = Guid.NewGuid().ToString();
-                examEntity.QuestionExams.Add(new QuestionExam { IdQuestionNavigation = questionEntity });
-            }
+            //foreach (var question in exam.Questions)
+            //{
+            //    if (question is MultipleChoiceQuestionModel mcq)
+            //    {
+            //        foreach (var possibility in mcq.Possibilities)
+            //        {
+            //            possibility.Id = Guid.NewGuid().ToString();
+            //        }
+            //    }
+            //    var questionEntity = question.GetQuestionEntiy(_mapper);
+            //    questionEntity.Id = Guid.NewGuid().ToString();
+            //    examEntity.QuestionExams.Add(new QuestionExam { IdQuestionNavigation = questionEntity });
+            //}
             _examRepository.Add(examEntity);
             exam = _mapper.Map<ExamModel>(examEntity);
             return CreatedAtAction(nameof(Post), new { id = examEntity.Id }, exam);
@@ -80,7 +78,7 @@ namespace InterviewPass.WebApi.Controllers
         [HttpDelete("{id}")]
         public void Delete(string id)
         {
-            _examRepository.Delete(_examRepository.GetByProperty(e => e.Id==id));
+            _examRepository.Delete(_examRepository.GetByProperty(e => e.Id == id));
         }
     }
 }
