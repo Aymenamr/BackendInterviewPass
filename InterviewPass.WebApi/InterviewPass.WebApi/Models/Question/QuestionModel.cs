@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
-using InterviewPass.WebApi.Enums;
 
 namespace InterviewPass.WebApi.Models.Question
 {
@@ -13,6 +11,7 @@ namespace InterviewPass.WebApi.Models.Question
         [Required]
         public double? Score { get; set; }
         [Required]
+        [RegularExpression(@"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", ErrorMessage = "Skill ID must be GUID.")]
         public string? SkillId { get; set; }
     }
 }
