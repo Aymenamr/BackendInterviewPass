@@ -73,30 +73,17 @@ namespace InterviewPass.WebApi.Controllers
             {
                 return Conflict("The Exam name already Exists !");
             }
+            if (exam.Questions.Any())
+            {
+                if (exam.Questions.Count != exam.NbrOfQuestion)
+                {
+                    return BadRequest("The number of questions is not equal to the number of questions introduced");
+                }
+                exam.MaxScore = exam.Questions.Sum(q => q.Score);
+            }
             Exam examEntity = _mapper.Map<Exam>(exam);
-            //foreach (var question in exam.Questions)
-            //{
-            //    if (question is MultipleChoiceQuestionModel mcq)
-            //    {
-            //        foreach (var possibility in mcq.Possibilities)
-            //        {
-            //            possibility.Id = Guid.NewGuid().ToString();
-            //        }
-            //    }
-            //    var questionEntity = question.GetQuestionEntiy(_mapper);
-            //    questionEntity.Id = Guid.NewGuid().ToString();
-            //    examEntity.QuestionExams.Add(new QuestionExam { IdQuestionNavigation = questionEntity });
-            //}
             _examRepository.Add(examEntity);
             exam.Questions = [];
-            // Reload the exam with all related entities
-            //examEntity = _examRepository.GetByPropertyQuery(
-            //    e => e.Id == examEntity.Id,
-            //    query => query.Include(e => e.QuestionExams)
-            //        .ThenInclude(qe => qe.IdQuestionNavigation)
-            //        .Include(e => e.QuestionExams)
-            //            .ThenInclude(qe => (qe.IdQuestionNavigation as MultipleChoiceQuestion).Possibilities)
-            //);
             exam = _mapper.Map<ExamModel>(examEntity);
             return CreatedAtAction(nameof(Post), new { id = examEntity.Id }, exam);
         }
