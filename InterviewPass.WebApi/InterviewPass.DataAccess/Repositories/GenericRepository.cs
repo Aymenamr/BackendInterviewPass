@@ -50,17 +50,6 @@ namespace InterviewPass.DataAccess.Repositories
 
             return query.FirstOrDefault(predicate); // Apply the condition and return the entity
         }
-        public T GetByPropertyWithQueryIncludes(Expression<Func<T, bool>> predicate, Func<IQueryable<T>, IQueryable<T>> includes = null)
-        {
-            IQueryable<T> query = _dbSet;
-
-            if (includes != null)
-            {
-                query = includes(query);
-            }
-
-            return query.FirstOrDefault(predicate);
-        }
 
         public List<T> GetAll()
         {
