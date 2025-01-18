@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace InterviewPass.WebApi.Models
 {
-    public class JsonResponse
+    public class JsonExceptionResponse
     {
         public int status { get; set; }
         public int close { get; set; }

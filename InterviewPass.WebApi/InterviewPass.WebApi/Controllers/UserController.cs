@@ -3,7 +3,6 @@ using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.WebApi.Enums;
 using InterviewPass.WebApi.Examples;
-using InterviewPass.WebApi.Exceptions;
 using InterviewPass.WebApi.Extensions;
 using InterviewPass.WebApi.Mapper;
 using InterviewPass.WebApi.Models.User;
@@ -50,8 +49,7 @@ namespace InterviewPass.WebApi.Controllers
 
             if (user == null)
             {
-                //return NotFound("The requested user was not found");
-                throw new EntityNotFoundException();
+                return NotFound("The requested user was not found");
             }
 
             switch (userType)
@@ -71,7 +69,6 @@ namespace InterviewPass.WebApi.Controllers
                     return BadRequest("Bad User type");
 
             }
-
         }
 
         // GET: api/<UserController
@@ -127,8 +124,7 @@ namespace InterviewPass.WebApi.Controllers
             }
             else
             {
-                //return Conflict("The Login already Exists !");
-                throw new Duplicate();
+                return Conflict("The Login already Exists !");
             }
             user = userEntity.GetUserModel(_mapper);
             return CreatedAtAction(nameof(Post), new { id = userEntity.Id }, user);

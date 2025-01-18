@@ -2,7 +2,6 @@
 using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories;
 using InterviewPass.DataAccess.Repositories.Interfaces;
-using InterviewPass.WebApi.Exceptions;
 using InterviewPass.WebApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -37,8 +36,7 @@ namespace InterviewPass.WebApi.Controllers
             var examEntity = _examRepository.GetByProperty(exam => exam.Id == id);
             if (examEntity == null)
             {
-                //return NotFound("Exam not found"); 
-                throw new EntityNotFoundException();
+                return NotFound("Exam not found");
             }
             return Ok(_mapper.Map<Exam>(examEntity));
         }
@@ -50,13 +48,11 @@ namespace InterviewPass.WebApi.Controllers
             Exam examEntity = _mapper.Map<Exam>(exam);
             if (_examRepository.GetByProperty(e => e.Name == exam.Name) != null)
             {
-                //return Conflict("The Exam name already Exists !");
-                throw new Duplicate();
+                return Conflict("The Exam name already Exists !");
             }
             _examRepository.Add(examEntity);
             return CreatedAtAction(nameof(Post), new { id = examEntity.Id }, exam);
         }
-
 
         // DELETE api/<ExamController>/5
         [HttpDelete("{id}")]

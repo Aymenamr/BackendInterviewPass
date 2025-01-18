@@ -6,7 +6,6 @@ using InterviewPass.DataAccess.Repositories;
 using InterviewPass.WebApi.Models;
 using InterviewPass.DataAccess.Entities;
 using System.Xml.Linq;
-using InterviewPass.WebApi.Exceptions;
 
 namespace InterviewPass.WebApi.Controllers
 {
@@ -52,8 +51,8 @@ namespace InterviewPass.WebApi.Controllers
         {
             var field = _fieldRepository.GetByProperty(field => field.Name == name);
             if (field == null)
-                //return NotFound("Field not found");
-                throw new EntityNotFoundException();
+                return NotFound("Field not found");
+            
             return Ok(_mapper.Map<FieldModel>(field));
         }
 
@@ -69,13 +68,10 @@ namespace InterviewPass.WebApi.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] FieldModel fieldmodel)
         {
-
-
             var fieldEntity = _mapper.Map<Field>(fieldmodel);
             if (_fieldRepository.GetByProperty(field => field.Name == fieldmodel.Name) != null)
             {
-                //return Conflict("The Field name already Exists !");
-                throw new Duplicate();
+                return Conflict("The Field name already Exists !");
             }
             _fieldRepository.Add(fieldEntity);
             fieldmodel.Id = fieldEntity.Id;
@@ -98,8 +94,8 @@ namespace InterviewPass.WebApi.Controllers
             var field = _fieldRepository.GetByProperty(f => f.Id == id);
             if (field == null)
             {
-                //return NotFound("Field not found");
-                throw new EntityNotFoundException();
+                return NotFound("Field not found");
+                
             }
             else if (field.Skills.Count > 0)
             {

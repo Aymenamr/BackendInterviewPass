@@ -1,72 +1,38 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Localization;
+﻿using InterviewPass.WebApi.Models;
 using Newtonsoft.Json;
-using System;
-using System.IO;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.Extensions;
-using InterviewPass.WebApi.Exceptions;
-using InterviewPass.WebApi.Models;
 
-namespace InterviewPass.WebApi.Middlewares
+public class ExceptionHandler
 {
-    public class ExceptionHandler
+    private readonly RequestDelegate _next;
+
+    public ExceptionHandler(RequestDelegate next)
     {
-        private readonly RequestDelegate _next;
-        private readonly IServiceProvider _serviceProvider;
+        _next = next;
+    }
 
-        public ExceptionHandler(RequestDelegate next,IServiceProvider serviceProvider)
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
         {
-            _next = next;
-            _serviceProvider = serviceProvider;
+            await _next(context);
         }
-
-        public async Task Invoke(HttpContext context)
+        catch (Exception ex)
         {
-            var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
-            var exception = exceptionHandlerPathFeature.Error;
-            var response = new JsonResponse();
-            context.Response.StatusCode = (int)HttpStatusCode.OK;
-            switch (exception)
-            {
-                case Duplicate _:
-                case EntityNotFoundException _:
-                    response.msg = $"e:{exception.Message}";
-                    response.close = 0;
-                    response.status = 0;
-                    break;
-                default:
-                    response.msg = $"e:حدث خطأ ما";
-                    response.close = 0;
-                    response.status = 0;
-                    var requestBody = string.Empty;
-                    var req = context.Request;
-                    req.EnableBuffering();
-                    if (req.Body.CanSeek)
-                    {
-                        req.Body.Seek(0, SeekOrigin.Begin);
-                        using (var reader = new StreamReader(
-                            req.Body,
-                            Encoding.UTF8,
-                            false,
-                            8192,
-                            true))
-                        {
-                            requestBody = await reader.ReadToEndAsync();
-                        }
-                        req.Body.Seek(0, SeekOrigin.Begin);
-                    }
-                    break;
-            }
-
-            context.Response.ContentType = "application/json";
-            await context.Response.WriteAsync(
-                JsonConvert.SerializeObject(response)
-            );
+            await HandleExceptionAsync(context, ex); 
         }
+    }
+    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        var response = new JsonExceptionResponse
+        {
+            msg = "An unexpected error occurred. Please try again later.",
+            close = 0,
+            status = (int)HttpStatusCode.InternalServerError
+        };
+
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = response.status;
+        return context.Response.WriteAsync(JsonConvert.SerializeObject(response));
     }
 }
