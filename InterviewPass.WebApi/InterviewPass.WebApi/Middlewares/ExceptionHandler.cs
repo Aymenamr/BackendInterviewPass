@@ -5,9 +5,9 @@ using System.Net;
 public class ExceptionHandler
 {
     private readonly RequestDelegate _next;
-    private readonly ILogger _logger;
+    private readonly ILogger<ExceptionHandler> _logger;
 
-    public ExceptionHandler(RequestDelegate next,ILogger logger)
+    public ExceptionHandler(RequestDelegate next,ILogger<ExceptionHandler> logger)
     {
         _next = next;
         _logger = logger;
