@@ -79,6 +79,7 @@ namespace InterviewPass.WebApi.Controllers
            
      
             _skillRepository.Add(skillEntity);
+            _skillRepository.Commit();
             skill.Id = skillEntity.Id;
             return CreatedAtAction(nameof(Get), new { name = skillEntity.Name }, skill);
         }

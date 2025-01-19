@@ -19,22 +19,24 @@ namespace InterviewPass.DataAccess.Repositories
             _dbSet = _dbContext.Set<T>();
         }
 
-        public void Add(T entity)
+        public T Add(T entity)
         {
             AssignGuidIfNeeded(entity);
-            _dbSet.Add(entity);
-            _dbContext.SaveChanges();
+            return _dbSet.Add(entity).Entity;
         }
 
         public void Update(T entity)
         {
             _dbSet.Update(entity);
-            _dbContext.SaveChanges();
         }
 
         public void Delete(T entity)
         {
             _dbSet.Remove(entity);
+        }
+
+        public void Commit()
+        {
             _dbContext.SaveChanges();
         }
 

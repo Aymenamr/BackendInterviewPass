@@ -11,7 +11,6 @@ namespace InterviewPass.WebApi.Mapper
     {
         public MappingProfile()
         {
-            //Exercice 05 Correction
             CreateMap<UserJobSeekerModel, UserJobSeeker>()
                .ForMember(destinationEntity => destinationEntity.SkillBySeekers,
                           opt => opt.MapFrom(sourceModel => sourceModel.Skills.Select(skill => new SkillBySeeker { SkillId = skill.Id })

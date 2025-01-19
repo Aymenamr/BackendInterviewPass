@@ -5,6 +5,7 @@ using InterviewPass.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using InterviewPass.WebApi.Examples;
 using Swashbuckle.AspNetCore.Filters;
+using InterviewPass.WebApi.Processors;
 
 
 namespace InterviewPass.WebApi.Controllers
@@ -16,12 +17,14 @@ namespace InterviewPass.WebApi.Controllers
         private readonly ILogger<ExamController> _logger;
         private readonly IGenericRepository<Exam> _examRepository;
         private readonly IMapper _mapper;
+        private readonly IExamProcessor _examProcessor;
 
-        public ExamController(ILogger<ExamController> logger, IGenericRepository<Exam> examRepository, IMapper mapper)
+        public ExamController(ILogger<ExamController> logger, IGenericRepository<Exam> examRepository, IMapper mapper,IExamProcessor examProcessor)
         {
             _logger = logger;
             _examRepository = examRepository;
             _mapper = mapper;
+            _examProcessor = examProcessor;
         }
         /// <summary>
         /// return the list of all exams 
@@ -67,25 +70,13 @@ namespace InterviewPass.WebApi.Controllers
         [HttpPost]
         [SwaggerRequestExample(typeof(ExamModel), typeof(ExamExampleDocumentation))]
         public IActionResult Post([FromBody] ExamModel exam)
-        {
-            
+        {            
             if (_examRepository.GetByProperty(e => e.Name == exam.Name) != null)
             {
                 return Conflict("The Exam name already Exists !");
-            }
-            if (exam.Questions.Any())
-            {
-                if (exam.Questions.Count != exam.NbrOfQuestion)
-                {
-                    return BadRequest("The number of questions is not equal to the number of questions introduced");
-                }
-                exam.MaxScore = exam.Questions.Sum(q => q.Score);
-            }
-            Exam examEntity = _mapper.Map<Exam>(exam);
-            _examRepository.Add(examEntity);
-            exam.Questions = [];
-            exam = _mapper.Map<ExamModel>(examEntity);
-            return CreatedAtAction(nameof(Post), new { id = examEntity.Id }, exam);
+            }         
+            _examProcessor.ProcessExam(exam);           
+            return CreatedAtAction(nameof(Post), new { id = "examEntity.Id" }, exam);
         }
 
         /// <summary>
