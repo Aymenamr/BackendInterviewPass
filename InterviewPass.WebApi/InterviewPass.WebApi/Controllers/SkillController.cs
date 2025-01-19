@@ -53,6 +53,7 @@ namespace InterviewPass.WebApi.Controllers
             var skill = _skillRepository.GetByProperty(skill => skill.Name == name);
             if (skill == null)
                 return NotFound("Skill not found");
+
             return Ok(_mapper.Map<SkillModel>(skill));
         }
 
@@ -69,20 +70,18 @@ namespace InterviewPass.WebApi.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] SkillModel skill)
         {
-            if (string.IsNullOrEmpty(skill.Name) ||string.IsNullOrWhiteSpace(skill.FieldId))
+            if (string.IsNullOrEmpty(skill.Name) || string.IsNullOrWhiteSpace(skill.FieldId))
                 return BadRequest("Name or FieldId cannot be null");
-           
+
             var skillEntity = _mapper.Map<Skill>(skill);
-           
+
             if (_skillRepository.GetByProperty(sk => sk.Name == skill.Name) != null)
                 return Conflict("Skill already exists");
-           
-     
+
             _skillRepository.Add(skillEntity);
             skill.Id = skillEntity.Id;
             return CreatedAtAction(nameof(Get), new { name = skillEntity.Name }, skill);
         }
-
 
         /// <summary>
         /// Delete a skill according to his id
@@ -97,12 +96,12 @@ namespace InterviewPass.WebApi.Controllers
         [HttpDelete("{name}")]
         public IActionResult Delete(string name)
         {
-            var skill = _skillRepository.GetByProperty(skill => skill.Name == name, skill => skill.SkillBySeekers,skill=>skill.Questions) ;
+            var skill = _skillRepository.GetByProperty(skill => skill.Name == name, skill => skill.SkillBySeekers, skill => skill.Questions);
             if (skill == null)
             {
                 return NotFound("Skill not found");
             }
-            else if (skill.SkillBySeekers!=null && skill.SkillBySeekers.Count > 0)
+            else if (skill.SkillBySeekers != null && skill.SkillBySeekers.Count > 0)
             {
                 return Conflict("Cannot delete the skill, it is affected to users");
             }

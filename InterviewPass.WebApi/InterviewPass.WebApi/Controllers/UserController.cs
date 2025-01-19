@@ -69,7 +69,6 @@ namespace InterviewPass.WebApi.Controllers
                     return BadRequest("Bad User type");
 
             }
-
         }
 
         // GET: api/<UserController

@@ -49,9 +49,10 @@ namespace InterviewPass.WebApi.Controllers
         [HttpGet("{name}")]
         public IActionResult Get(string name)
         {
-            var field = _fieldRepository.GetByProperty(field => field.Name==name);
+            var field = _fieldRepository.GetByProperty(field => field.Name == name);
             if (field == null)
                 return NotFound("Field not found");
+            
             return Ok(_mapper.Map<FieldModel>(field));
         }
 
@@ -67,8 +68,6 @@ namespace InterviewPass.WebApi.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] FieldModel fieldmodel)
         {
-
-
             var fieldEntity = _mapper.Map<Field>(fieldmodel);
             if (_fieldRepository.GetByProperty(field => field.Name == fieldmodel.Name) != null)
             {
@@ -92,11 +91,13 @@ namespace InterviewPass.WebApi.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
-            var field = _fieldRepository.GetByProperty(f => f.Id==id);
+            var field = _fieldRepository.GetByProperty(f => f.Id == id);
             if (field == null)
             {
                 return NotFound("Field not found");
-            } else if (field.Skills.Count > 0)
+                
+            }
+            else if (field.Skills.Count > 0)
             {
                 return BadRequest("The field is used in some skills");
             }

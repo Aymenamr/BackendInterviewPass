@@ -12,6 +12,8 @@ using Swashbuckle.AspNetCore.Filters;
 using InterviewPass.WebApi.Examples;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Microsoft.AspNetCore.Diagnostics;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +28,6 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
         .RegisterSubtype(typeof(UserHrModel), UserType.Hr)
         .SerializeDiscriminatorProperty()
         .Build());
-
 });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -68,17 +69,19 @@ builder.Services.AddTransient<Func<string, IUserRepository>>(serviceProvider => 
 
 var app = builder.Build();
 
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
-app.UseSwagger();
-app.UseSwaggerUI();
-//builder.WebHost.UseUrls("http://*:1302");
 app.UseSerilogRequestLogging();
-
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
+app.UseMiddleware<ExceptionHandler>();
 app.MapControllers();
 
 app.Run();

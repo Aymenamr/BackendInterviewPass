@@ -25,7 +25,7 @@ namespace InterviewPass.WebApi.Controllers
         // GET: api/<ExamController>
         [HttpGet]
         public IActionResult Get()
-        {
+        {           
             return Ok(_mapper.Map<List<ExamModel>>(_examRepository.GetAll()));
         }
 
@@ -33,12 +33,12 @@ namespace InterviewPass.WebApi.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
-            var examEntity = _examRepository.GetByProperty(exam => exam.Id==id);
-            if(examEntity == null) 
-            { 
-                return NotFound("Exam not found"); 
+            var examEntity = _examRepository.GetByProperty(exam => exam.Id == id);
+            if (examEntity == null)
+            {
+                return NotFound("Exam not found");
             }
-            return Ok(_mapper.Map<Exam>(examEntity)) ;
+            return Ok(_mapper.Map<Exam>(examEntity));
         }
 
         // POST api/<ExamController>
@@ -54,12 +54,11 @@ namespace InterviewPass.WebApi.Controllers
             return CreatedAtAction(nameof(Post), new { id = examEntity.Id }, exam);
         }
 
-
         // DELETE api/<ExamController>/5
         [HttpDelete("{id}")]
         public void Delete(string id)
         {
-            _examRepository.Delete(_examRepository.GetByProperty(e => e.Id==id));
+            _examRepository.Delete(_examRepository.GetByProperty(e => e.Id == id));
         }
     }
 }
