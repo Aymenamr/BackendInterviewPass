@@ -9,7 +9,6 @@ namespace InterviewPass.WebApi.Models
     public class JsonExceptionResponse
     {
         public int status { get; set; }
-        public int close { get; set; }
         public string msg { get; set; }
     }
 }

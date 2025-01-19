@@ -25,7 +25,7 @@ namespace InterviewPass.WebApi.Controllers
         // GET: api/<ExamController>
         [HttpGet]
         public IActionResult Get()
-        {
+        {           
             return Ok(_mapper.Map<List<ExamModel>>(_examRepository.GetAll()));
         }
 
