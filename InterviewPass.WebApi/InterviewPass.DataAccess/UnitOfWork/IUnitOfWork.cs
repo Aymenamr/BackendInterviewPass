@@ -11,6 +11,7 @@ namespace InterviewPass.DataAccess.UnitOfWork
     public interface IUnitOfWork
     {   
         IGenericRepository<Exam> ExamRepo { get; }
+        IGenericRepository<Possibility> PossibilityRepo { get; }
         IGenericRepository<Question> QuestionRepo { get; }
         void Save();
     }

@@ -41,7 +41,15 @@ namespace InterviewPass.WebApi.Extensions
         {
             if (model is MultipleChoiceQuestionModel mcq)
             {
-                return mapper.Map<MultipleChoiceQuestion>(mcq);
+                var multipleQ = mapper.Map<MultipleChoiceQuestion>(mcq);
+                if (multipleQ.Possibilities != null)
+                {
+                    foreach (var possibility in multipleQ.Possibilities)
+                    {
+                        possibility.Id = Guid.NewGuid().ToString();
+                    }
+                }
+                return multipleQ;
             }
             else if (model is TrueFalseQuestionModel trueFalseQuestion)
             {

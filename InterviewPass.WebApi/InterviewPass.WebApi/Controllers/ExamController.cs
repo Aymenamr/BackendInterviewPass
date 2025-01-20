@@ -74,7 +74,16 @@ namespace InterviewPass.WebApi.Controllers
             if (_examRepository.GetByProperty(e => e.Name == exam.Name) != null)
             {
                 return Conflict("The Exam name already Exists !");
-            }         
+            }
+            if (exam.Questions.Any())
+            {
+                if (exam.Questions.Count != exam.NbrOfQuestion)
+                {
+                    return BadRequest("The number of questions is not equal to the number of questions introduced");
+                }
+                exam.MaxScore = exam.Questions.Sum(q => q.Score);
+            }
+
             _examProcessor.ProcessExam(exam);           
             return CreatedAtAction(nameof(Post), new { id = "examEntity.Id" }, exam);
         }

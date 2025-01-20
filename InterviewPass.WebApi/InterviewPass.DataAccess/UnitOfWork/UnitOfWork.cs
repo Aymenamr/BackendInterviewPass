@@ -14,6 +14,7 @@ namespace InterviewPass.DataAccess.UnitOfWork
     {
         public IGenericRepository<Exam>  ExamRepo { get; }
         public IGenericRepository<Question> QuestionRepo { get;}
+        public IGenericRepository<Possibility> PossibilityRepo { get;}
         
         private readonly DbContext _dbContext;
     
@@ -22,6 +23,7 @@ namespace InterviewPass.DataAccess.UnitOfWork
             _dbContext = dbContext;
             ExamRepo = new GenericRepository<Exam>(_dbContext);
             QuestionRepo = new GenericRepository<Question>(_dbContext);
+            PossibilityRepo = new GenericRepository<Possibility>(_dbContext);
         }
 
         public void Save()
