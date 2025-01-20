@@ -74,6 +74,7 @@ namespace InterviewPass.WebApi.Controllers
                 return Conflict("The Field name already Exists !");
             }
             _fieldRepository.Add(fieldEntity);
+            _fieldRepository.Commit();
             fieldmodel.Id = fieldEntity.Id;
             return CreatedAtAction(nameof(Get), new { name = fieldEntity.Name }, fieldmodel);
         }

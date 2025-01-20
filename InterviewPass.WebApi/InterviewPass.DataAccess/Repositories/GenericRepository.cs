@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace InterviewPass.DataAccess.Repositories
 {
-    public class GenericRepository<T>: IGenericRepository<T> where T : class 
+    public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         private readonly DbContext _dbContext;
         private readonly DbSet<T> _dbSet;
@@ -19,22 +19,24 @@ namespace InterviewPass.DataAccess.Repositories
             _dbSet = _dbContext.Set<T>();
         }
 
-        public void Add(T entity)
+        public T Add(T entity)
         {
             AssignGuidIfNeeded(entity);
-            _dbSet.Add(entity);
-            _dbContext.SaveChanges();
+            return _dbSet.Add(entity).Entity;
         }
 
         public void Update(T entity)
         {
             _dbSet.Update(entity);
-            _dbContext.SaveChanges();
         }
 
         public void Delete(T entity)
         {
             _dbSet.Remove(entity);
+        }
+
+        public void Commit()
+        {
             _dbContext.SaveChanges();
         }
 
@@ -63,7 +65,7 @@ namespace InterviewPass.DataAccess.Repositories
 
             if (idProperty != null && idProperty.PropertyType == typeof(string))
             {
-                idProperty.SetValue(entity, Guid.NewGuid().ToString());                
+                idProperty.SetValue(entity, Guid.NewGuid().ToString());
             }
         }
     }
