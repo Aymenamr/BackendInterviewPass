@@ -5,6 +5,6 @@ namespace InterviewPass.WebApi.Processors
 {
     public interface IExamProcessor
     {
-        void ProcessExam(ExamModel exam);
+        ExamModel ProcessExam(ExamModel exam);
     }
 }

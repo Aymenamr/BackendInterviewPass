@@ -85,7 +85,7 @@ namespace InterviewPass.WebApi.Controllers
             }
 
             _examProcessor.ProcessExam(exam);           
-            return CreatedAtAction(nameof(Post), new { id = "examEntity.Id" }, exam);
+            return CreatedAtAction(nameof(Post), new { id = exam.Id }, exam);
         }
 
         /// <summary>

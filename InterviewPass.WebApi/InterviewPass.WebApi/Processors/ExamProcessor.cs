@@ -19,7 +19,7 @@ namespace InterviewPass.WebApi.Processors
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public void ProcessExam(ExamModel exam)
+        public ExamModel ProcessExam(ExamModel exam)
         {          
 
             Exam examEntity = _mapper.Map<Exam>(exam);
@@ -45,7 +45,9 @@ namespace InterviewPass.WebApi.Processors
                            IdExam = idExam
                        });
             }
+            exam.Id  = idExam;
             _unitOfWork.Save();
+            return exam;    
         }
     }
 }
