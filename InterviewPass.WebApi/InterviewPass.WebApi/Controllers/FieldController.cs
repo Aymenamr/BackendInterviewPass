@@ -63,7 +63,7 @@ namespace InterviewPass.WebApi.Controllers
         /// <returns></returns>
         /// <response code="201">The field was successfully created.</response>
         /// <response code="409">The field data conflict with other field data.</response>
-        /// <response code="500">If there is an error retrieving the data test comment.</response>
+        /// <response code="500">If there is an error retrieving the data.</response>
         // POST api/<FieldController>
         [HttpPost]
         public IActionResult Post([FromBody] FieldModel fieldmodel)
