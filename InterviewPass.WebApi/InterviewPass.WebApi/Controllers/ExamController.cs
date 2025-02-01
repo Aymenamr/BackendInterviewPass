@@ -97,7 +97,7 @@ namespace InterviewPass.WebApi.Controllers
         /// <response code="404">Exam not found.</response>
         /// <response code="400">Exam is used in some skills.</response>
         /// <response code="500">If there is an error retrieving the data.</response>
-        // DELETE api/<ExamController>/5
+        // DELETE api/<ExamController>/d1010c4f-690f-4ff0-a96d-84e75241f4bb
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
