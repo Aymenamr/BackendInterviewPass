@@ -27,7 +27,11 @@ namespace InterviewPass.DataAccess.Services
             _dbContext.SaveChanges();
         }
 
-
+        /// <summary>
+        /// Methd to get user
+        /// </summary>
+        /// <param name="login"></param>
+        /// <returns></returns>
         public User GetUser(string login)
         {
             //Exercice 05 Correction
