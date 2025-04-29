@@ -28,13 +28,13 @@ namespace InterviewPass.DataAccess.Services
         }
 
         /// <summary>
-        /// Methd to get user
+        /// Method to get a job seeker from the database
+        /// according to the login
         /// </summary>
         /// <param name="login"></param>
-        /// <returns></returns>
+        /// <returns>The user entity with all his skills included</returns>
         public User GetUser(string login)
         {
-            //Exercice 05 Correction
             return _dbContext.UserJobSeekers.Include(user => user.SkillBySeekers).ThenInclude(sbs => sbs.Skill).FirstOrDefault(user => user.Login == login);
         }
 
