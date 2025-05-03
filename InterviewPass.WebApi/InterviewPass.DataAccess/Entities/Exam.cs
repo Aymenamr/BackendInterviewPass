@@ -23,7 +23,11 @@ public partial class Exam
 
     public DateTime? CreationDate { get; set; }
 
-    public string? JobId { get; set; }
+    public virtual ICollection<Answer> Answers { get; set; } = new List<Answer>();
 
-    public virtual Job? Job { get; set; }
+    public virtual UserHr? CreatedByNavigation { get; set; }
+
+    public virtual ICollection<QuestionExam> QuestionExams { get; set; } = new List<QuestionExam>();
+
+    public virtual ICollection<Result> Results { get; set; } = new List<Result>();
 }

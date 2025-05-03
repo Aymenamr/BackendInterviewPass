@@ -44,16 +44,8 @@ public partial class InterviewPassContext : DbContext
 
     public virtual DbSet<UserJobSeeker> UserJobSeekers { get; set; }
 
-    public virtual DbSet<EmploymentType> EmploymentTypes { get; set; }
-
-    public virtual DbSet<Job> Jobs { get; set; }
-
-    public virtual DbSet<JobFile> JobFiles { get; set; }
-
-    public virtual DbSet<JobSkill> JobSkills { get; set; }
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlite(string.Format("DataSource={0}", DbPath));
+        => optionsBuilder.UseSqlite(string.Format("DataSource={0}",DbPath));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -88,7 +80,7 @@ public partial class InterviewPassContext : DbContext
             entity.HasIndex(e => e.Name, "IX_Exam_Name").IsUnique();
             entity.Property(e => e.Id).HasColumnType("STRING");
             entity.Property(e => e.CreatedBy).HasColumnType("STRING");
-            entity.Property(e => e.CreationDate).HasColumnType("DATETIME");
+			entity.Property(e => e.CreationDate).HasColumnType("DATETIME");
 
             entity.Property(e => e.Description).HasColumnType("STRING");
             entity.Property(e => e.MaxScore).HasColumnType("DOUBLE");
@@ -96,7 +88,6 @@ public partial class InterviewPassContext : DbContext
             entity.Property(e => e.Name).HasColumnType("VARCHAR");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.Exams).HasForeignKey(d => d.CreatedBy);
-            entity.HasOne(d => d.Job).WithMany(p => p.Exams).HasForeignKey(d => d.JobId);
         });
 
         modelBuilder.Entity<Field>(entity =>
@@ -128,7 +119,7 @@ public partial class InterviewPassContext : DbContext
                                        .HasValue<PracticalQuestion>("Practical");
 
             entity.Property(e => e.Id).HasColumnType("STRING");
-            entity.Property(e => e.Content).HasColumnType("STRING");
+            entity.Property(e => e.Content).HasColumnType("STRING");            
             entity.Property(e => e.Score).HasColumnType("DOUBLE");
             entity.Property(e => e.Type).HasColumnType("STRING");
             entity.HasOne(d => d.Skill).WithMany(p => p.Questions).HasForeignKey(d => d.SkillId);
@@ -235,36 +226,6 @@ public partial class InterviewPassContext : DbContext
             entity.Property(e => e.PasswordHash).HasColumnType("VARCHAR");
             entity.Property(e => e.Phone).HasColumnType("VARCHAR");
         });
-
-
-        modelBuilder.Entity<EmploymentType>(entity =>
-        {
-            entity.ToTable("EmploymentType");
-
-            entity.Property(e => e.Id).ValueGeneratedNever();
-        });
-
-
-        modelBuilder.Entity<Job>(entity =>
-        {
-            entity.ToTable("Job");
-
-            entity.Property(e => e.CreatedDate).HasColumnType("DateTime");
-            entity.Property(e => e.ImagePath).HasColumnName("Image_path");
-
-            entity.HasOne(d => d.EmploymentType).WithMany(p => p.Jobs).HasForeignKey(d => d.EmploymentTypeId);
-        });
-
-        modelBuilder.Entity<JobFile>(entity =>
-        {
-            entity.HasOne(d => d.Job).WithMany(p => p.JobFiles).HasForeignKey(d => d.JobId);
-        });
-
-        modelBuilder.Entity<JobSkill>(entity =>
-        {
-            entity.HasOne(d => d.Job).WithMany(p => p.JobSkills).HasForeignKey(d => d.JobId);
-        });
-
 
         OnModelCreatingPartial(modelBuilder);
     }
