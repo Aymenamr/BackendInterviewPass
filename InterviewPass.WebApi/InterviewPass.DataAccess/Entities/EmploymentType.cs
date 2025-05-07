@@ -4,8 +4,7 @@
 	{
 		public string Id { get; set; } = null!;
 		public string? Type { get; set; }
+		public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
 
-		public string? JobId { get; set; }
-		public virtual Job? Job { get; set; }
 	}
 }

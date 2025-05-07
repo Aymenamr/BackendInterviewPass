@@ -186,13 +186,10 @@ public partial class InterviewPassContext : DbContext
 			entity.HasIndex(e => e.Name, "IX_Skill_Name").IsUnique();
 
 			entity.Property(e => e.Id).HasColumnType("VARCHAR");
-
 			entity.Property(e => e.FieldId).HasColumnType("STRING");
 			entity.Property(e => e.Name).HasColumnType("STRING");
-			entity.Property(e => e.JobId).HasColumnType("STRING");
 
 			entity.HasOne(d => d.Field).WithMany(p => p.Skills).HasForeignKey(d => d.FieldId);
-			entity.HasOne(d => d.Job).WithMany(p => p.Skills).HasForeignKey(d => d.JobId);
 		});
 
 		modelBuilder.Entity<SkillBySeeker>(entity =>
@@ -248,11 +245,17 @@ public partial class InterviewPassContext : DbContext
 			entity.Property(e => e.Title).HasColumnType("STRING");
 			entity.Property(e => e.ShortDescription).HasColumnType("STRING");
 			entity.Property(e => e.ImagePath).HasColumnType("STRING");
-			entity.Property(e => e.experience).HasColumnType("INTEGER");
+			entity.Property(e => e.Experience).HasColumnType("INTEGER");
 			entity.Property(e => e.WorkingSchedule).HasColumnType("STRING");
 			entity.Property(e => e.Role).HasColumnType("STRING");
 			entity.Property(e => e.Salary).HasColumnType("DOUBLE");
 
+			entity.Property(e => e.EmploymentTypeId).HasColumnType("STRING");
+
+			entity.HasOne(e => e.EmploymentType)
+				  .WithMany(e => e.Jobs)
+				  .HasForeignKey(e => e.EmploymentTypeId)
+				  .OnDelete(DeleteBehavior.Restrict);
 		});
 
 		modelBuilder.Entity<EmploymentType>(entity =>
@@ -261,10 +264,7 @@ public partial class InterviewPassContext : DbContext
 
 			entity.Property(e => e.Id).HasColumnType("STRING");
 			entity.Property(e => e.Type).HasColumnType("STRING");
-			entity.Property(e => e.JobId).HasColumnType("STRING");
 
-			entity.HasOne(e => e.Job).WithMany(d => d.EmploymentTypes).HasForeignKey(e => e.JobId)
-			.OnDelete(DeleteBehavior.Restrict);
 		});
 
 		modelBuilder.Entity<Benefits>(entity =>
@@ -281,8 +281,8 @@ public partial class InterviewPassContext : DbContext
 			entity.ToTable("JobBenefit");
 
 			entity.Property(e => e.Id).HasColumnType("STRING").IsRequired();
-			entity.Property(e => e.JobId).HasColumnType("STRING").IsRequired(false);
-			entity.Property(e => e.BenefitsId).HasColumnType("STRING").IsRequired(false);
+			entity.Property(e => e.JobId).HasColumnType("STRING").IsRequired();
+			entity.Property(e => e.BenefitsId).HasColumnType("STRING").IsRequired();
 
 			entity.HasOne(e => e.Job).WithMany(d => d.JobBenefits).HasForeignKey(d => d.JobId)
 			.OnDelete(DeleteBehavior.Restrict);
@@ -291,6 +291,26 @@ public partial class InterviewPassContext : DbContext
 			.OnDelete(DeleteBehavior.Restrict);
 
 
+		});
+
+		modelBuilder.Entity<JobSkill>(entity =>
+		{
+			entity.ToTable("JobSkill");
+
+			entity.Property(e => e.Id).HasColumnType("STRING");
+
+			entity.Property(e => e.JobId).HasColumnType("STRING");
+			entity.Property(e => e.SkillId).HasColumnType("STRING");
+
+			entity.HasOne(d => d.Job)
+				  .WithMany(d => d.JobSkills)
+				  .HasForeignKey(d => d.JobId)
+				  .OnDelete(DeleteBehavior.Restrict);
+
+			entity.HasOne(d => d.Skill)
+				  .WithMany(d => d.JobSkills)
+				  .HasForeignKey(d => d.SkillId)
+				  .OnDelete(DeleteBehavior.Restrict);
 		});
 
 		modelBuilder.Entity<JobFile>(entity =>
@@ -304,8 +324,6 @@ public partial class InterviewPassContext : DbContext
 
 			entity.HasOne(d => d.Job).WithMany(j => j.JobFiles).HasForeignKey(d => d.JobId)
 			.OnDelete(DeleteBehavior.Restrict);
-
-
 		});
 		OnModelCreatingPartial(modelBuilder);
 	}

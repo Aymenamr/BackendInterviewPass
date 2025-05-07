@@ -6,14 +6,15 @@
 		public string? Title { get; set; }
 		public string? ShortDescription { get; set; }
 		public string? ImagePath { get; set; }
-		public int? experience { get; set; }
+		public int? Experience { get; set; }
 		public string? WorkingSchedule { get; set; }
 		public string? Role { get; set; }
 		public double? Salary { get; set; }
-		public virtual ICollection<EmploymentType> EmploymentTypes { get; set; } = new List<EmploymentType>();
+		public string? EmploymentTypeId { get; set; }
+		public virtual EmploymentType? EmploymentType { get; set; }
 		public virtual ICollection<JobFile> JobFiles { get; set; } = new List<JobFile>();
-		public virtual ICollection<Skill> Skills { get; set; } = new List<Skill>();
 		public virtual ICollection<JobBenefit> JobBenefits { get; set; } = new List<JobBenefit>();
+		public virtual ICollection<JobSkill> JobSkills { get; set; } = new List<JobSkill>();
 
 
 	}

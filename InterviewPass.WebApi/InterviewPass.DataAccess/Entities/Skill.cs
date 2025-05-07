@@ -10,9 +10,7 @@ public partial class Skill
 
 	public virtual Field? Field { get; set; }
 
-	public string? JobId { get; set; }
-
-	public virtual Job? Job { get; set; }
+	public virtual ICollection<JobSkill> JobSkills { get; set; } = new List<JobSkill>();
 
 	public virtual ICollection<Question> Questions { get; set; } = new List<Question>();
 
