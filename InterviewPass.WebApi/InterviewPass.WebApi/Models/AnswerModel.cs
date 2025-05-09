@@ -8,7 +8,8 @@ namespace InterviewPass.WebApi.Models
         [RegularExpression(@"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", ErrorMessage = "ID must be GUID.")]
         public String? Id { get; set; } = null!;
 		[Required]
-        public String? Name { get; set; }
+        [MaxLength(length: 100, ErrorMessage = "Exam Answer name is too large.")]
+        public String Name { get; set; }
         [Required]
         public String? Type { get; set; }
         [Required]
