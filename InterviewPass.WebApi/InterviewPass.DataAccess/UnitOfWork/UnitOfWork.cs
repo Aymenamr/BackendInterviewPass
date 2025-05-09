@@ -2,34 +2,31 @@
 using InterviewPass.DataAccess.Repositories;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InterviewPass.DataAccess.UnitOfWork
 {
-    public class UnitOfWork : IUnitOfWork
-    {
-        public IGenericRepository<Exam>  ExamRepo { get; }
-        public IGenericRepository<Question> QuestionRepo { get;}
-        public IGenericRepository<Possibility> PossibilityRepo { get;}
-        
-        private readonly DbContext _dbContext;
-    
-        public UnitOfWork(DbContext dbContext)
-        {
-            _dbContext = dbContext;
-            ExamRepo = new GenericRepository<Exam>(_dbContext);
-            QuestionRepo = new GenericRepository<Question>(_dbContext);
-            PossibilityRepo = new GenericRepository<Possibility>(_dbContext);
-        }
+	public class UnitOfWork : IUnitOfWork
+	{
+		public IGenericRepository<Exam> ExamRepo { get; }
+		public IGenericRepository<Question> QuestionRepo { get; }
+		public IGenericRepository<Possibility> PossibilityRepo { get; }
+		public IGenericRepository<Job> JobRepo { get; }
 
-        public void Save()
-        {
-            _dbContext.SaveChanges();
-        }
+		private readonly DbContext _dbContext;
 
-    }
+		public UnitOfWork(DbContext dbContext)
+		{
+			_dbContext = dbContext;
+			ExamRepo = new GenericRepository<Exam>(_dbContext);
+			QuestionRepo = new GenericRepository<Question>(_dbContext);
+			PossibilityRepo = new GenericRepository<Possibility>(_dbContext);
+			JobRepo = new GenericRepository<Job>(_dbContext);
+		}
+
+		public void Save()
+		{
+			_dbContext.SaveChanges();
+		}
+
+	}
 }

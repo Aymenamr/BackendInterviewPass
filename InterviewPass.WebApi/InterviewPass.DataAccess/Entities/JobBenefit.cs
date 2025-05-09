@@ -1,0 +1,12 @@
+﻿namespace InterviewPass.DataAccess.Entities
+{
+	public partial class JobBenefit
+	{
+		public string Id { get; set; } = null!;
+		public string? JobId { get; set; }
+
+		public virtual Job? Job { get; set; }
+		public string? BenefitsId { get; set; }
+		public virtual Benefits? Benefits { get; set; }
+	}
+}
