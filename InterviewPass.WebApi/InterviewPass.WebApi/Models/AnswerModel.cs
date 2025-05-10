@@ -12,8 +12,8 @@ namespace InterviewPass.WebApi.Models
         public String Name { get; set; }
         [Required]
         public String? Type { get; set; }
-        [Required]
-        public String? Content { get; set; }
+        //[Required]
+        //public String? Content { get; set; }
         [Required]
         public double? Score { get; set; }
         [Required]
