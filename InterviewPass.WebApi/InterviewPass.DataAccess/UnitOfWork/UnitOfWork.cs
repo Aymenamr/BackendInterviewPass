@@ -15,7 +15,10 @@ namespace InterviewPass.DataAccess.UnitOfWork
         public IGenericRepository<Exam>  ExamRepo { get; }
         public IGenericRepository<Question> QuestionRepo { get;}
         public IGenericRepository<Possibility> PossibilityRepo { get;}
-        
+        //Lubna(Answer)
+        public IGenericRepository<Answer> AnswerRepo { get; }
+
+
         private readonly DbContext _dbContext;
     
         public UnitOfWork(DbContext dbContext)
@@ -24,6 +27,8 @@ namespace InterviewPass.DataAccess.UnitOfWork
             ExamRepo = new GenericRepository<Exam>(_dbContext);
             QuestionRepo = new GenericRepository<Question>(_dbContext);
             PossibilityRepo = new GenericRepository<Possibility>(_dbContext);
+            //Lubna(Answer)
+            AnswerRepo = new GenericRepository<Answer>(_dbContext);
         }
 
         public void Save()

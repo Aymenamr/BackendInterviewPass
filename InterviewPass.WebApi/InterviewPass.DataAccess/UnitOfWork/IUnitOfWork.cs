@@ -13,6 +13,8 @@ namespace InterviewPass.DataAccess.UnitOfWork
         IGenericRepository<Exam> ExamRepo { get; }
         IGenericRepository<Possibility> PossibilityRepo { get; }
         IGenericRepository<Question> QuestionRepo { get; }
+        //Lubna(Answer)
+        IGenericRepository<Answer> AnswerRepo { get; }
         void Save();
     }
 }
