@@ -35,17 +35,12 @@ namespace InterviewPass.WebApi.Mapper
                 .ForMember(dest => dest.Author, opt => opt.MapFrom(src => src.CreatedBy));
 
             //Lubna Answer Map
-            //CreateMap<AnswerModel, Answer>()
-            //    .ForMember(dest => dest.AnswerQuestionExams, opt => opt.MapFrom(src =>
-            //    src.Answers.Select(q => new AnswerQuestionExam
-            //    {
-            //        IdAnswerNavigation = q.GetAnswerEntiy()
-            //    })))
-            //    .ReverseMap()
-            //    .ForMember(dest => dest.Answers,
-            //            opt => opt.MapFrom(src =>
-            //                src.AnswerQuestionExams.Select(qe =>
-            //                    qe.IdAnswerNavigation.GetAnswerModel())));
+            CreateMap<AnswerModel, Answer>()
+                .ForMember(dest => dest.Result, opt => opt.MapFrom(src =>
+                      src.ObtainedScore.Select(q => new Result
+                      {
+                          SelectedPossibilities = q.SelectedPossibilities()
+                      })));
 
             CreateMap<Field, FieldModel>().ReverseMap();
             CreateMap<Skill, SkillModel>().ReverseMap();
