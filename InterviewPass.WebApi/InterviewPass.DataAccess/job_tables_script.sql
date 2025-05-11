@@ -5,7 +5,6 @@ CREATE TABLE "Job" (
 	"ImagePath"	TEXT,
 	"EmploymentTypeId"	TEXT,
 	"experience"	INTEGER,
-	"SkillId"	TEXT,
 	"WorkingSchedule"	TEXT,
 	"Role"	TEXT,
 	"Salary"	REAL,

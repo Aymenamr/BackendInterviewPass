@@ -41,16 +41,14 @@ public partial class InterviewPassContext : DbContext
 	public virtual DbSet<UserHr> UserHrs { get; set; }
 
 	public virtual DbSet<UserJobSeeker> UserJobSeekers { get; set; }
-	public virtual DbSet<Job> Job { get; set; }
+	public virtual DbSet<Job> Jobs { get; set; }
 	public virtual DbSet<Benefits> Benefits { get; set; }
-	public virtual DbSet<EmploymentType> EmploymentType { get; set; }
-	public virtual DbSet<JobBenefit> JobBenefit { get; set; }
+	public virtual DbSet<EmploymentType> EmploymentTypes { get; set; }
+	public virtual DbSet<JobBenefit> JobBenefits { get; set; }
 
-	public virtual DbSet<JobFile> JobFile { get; set; }
+	public virtual DbSet<JobFile> JobFiles { get; set; }
 
-
-
-
+	public virtual DbSet<JobSkill> JobSkills { get; set; }
 
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -282,12 +280,12 @@ public partial class InterviewPassContext : DbContext
 
 			entity.Property(e => e.Id).HasColumnType("STRING").IsRequired();
 			entity.Property(e => e.JobId).HasColumnType("STRING").IsRequired();
-			entity.Property(e => e.BenefitsId).HasColumnType("STRING").IsRequired();
+			entity.Property(e => e.BenefitId).HasColumnType("STRING").IsRequired();
 
 			entity.HasOne(e => e.Job).WithMany(d => d.JobBenefits).HasForeignKey(d => d.JobId)
 			.OnDelete(DeleteBehavior.Restrict);
 
-			entity.HasOne(d => d.Benefits).WithMany(d => d.JobBenefits).HasForeignKey(d => d.BenefitsId)
+			entity.HasOne(d => d.Benefits).WithMany(d => d.JobBenefits).HasForeignKey(d => d.BenefitId)
 			.OnDelete(DeleteBehavior.Restrict);
 
 
