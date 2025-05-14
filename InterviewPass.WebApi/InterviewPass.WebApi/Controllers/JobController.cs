@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories.Interfaces;
+using InterviewPass.WebApi.Examples;
 using InterviewPass.WebApi.Models;
+using InterviewPass.WebApi.Processors;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace InterviewPass.WebApi.Controllers
 {
@@ -11,113 +14,141 @@ namespace InterviewPass.WebApi.Controllers
 	public class JobController : ControllerBase
 	{
 		private readonly ILogger<JobController> _logger;
-		private readonly IGenericRepository<Job> _jobRepository;
-		private readonly IGenericRepository<JobFile> _JobFileRepository;
-		private readonly IGenericRepository<JobBenefit> _JobBenefitRepository;
-		private readonly IGenericRepository<JobSkill> _JobSkillRepository;
+		//private readonly IGenericRepository<Job> _jobRepository;
+		private readonly IJobRepository _jobRepo;
+		private readonly IJobProcessor _IJobProcessor;
+
 
 		private readonly IMapper _mapper;
-		public JobController(ILogger<JobController> logger, IGenericRepository<Job> jobRepository, IGenericRepository<JobFile> JobFileRepository, IGenericRepository<JobBenefit> JobBenefitRepository, IGenericRepository<JobSkill> JobSkillRepository, IMapper mapper)
+		public JobController(ILogger<JobController> logger, IJobProcessor IJobProcessor, IGenericRepository<Job> jobRepository, IJobRepository jobRepo, IMapper mapper)
 		{
 			_logger = logger;
-			_jobRepository = jobRepository;
+			//_jobRepository = jobRepository;
 			_mapper = mapper;
-			_JobFileRepository = JobFileRepository;
-			_JobSkillRepository = JobSkillRepository;
-			_JobBenefitRepository = JobBenefitRepository;
+			_IJobProcessor = IJobProcessor;
+			_jobRepo = jobRepo;
 		}
-
+		/// <summary>
+		/// return the list of all jobs .
+		/// </summary>
+		/// <returns></returns>
+		/// <response code="200">Returns the list of jobs successfully.</response>
+		/// <response code="500">If an internal server error occurs while retrieving the jobs.</response>
 		[HttpGet]
 		public IActionResult GetJobs()
 		{
-			return Ok(_mapper.Map<List<JobModel>>(_jobRepository.GetAll()));
+			return Ok(_mapper.Map<List<JobModel>>(_jobRepo.GetAllWithDetails()));
 		}
-
+		/// <summary>
+		/// Retrieves a specific job by its title.
+		/// </summary>
+		/// <param name="title">The title of the job to retrieve.</param>
+		/// <returns></returns>
+		/// <response code="200">Returns the job that matches the given title.</response>
+		/// <response code="404">If no job with the specified title is found.</response>
+		/// <response code="500">If an internal server error occurs while retrieving the job.</response>
 		[HttpGet("{title}")]
 		public IActionResult Get(string title)
 		{
-			var job = _jobRepository.GetByProperty(Job => Job.Title == title, j => j.JobFiles, j => j.JobBenefits, j => j.JobSkills);
+			var job = _jobRepo.GetJobWithDetails(Job => Job.Title == title);
 			if (job == null)
 				return NotFound("Job not found");
 
 			return Ok(_mapper.Map<JobModel>(job));
 		}
-
+		/// <summary>
+		/// Retrieves a specific job by its unique id.
+		/// </summary>
+		/// <param name="id">The unique identifier of the job to retrieve.</param>
+		/// <returns></returns>
+		/// <response code="200">Returns the job that matches the given ID.</response>
+		/// <response code="404">If no job with the specified ID is found.</response>
+		/// <response code="500">If an internal server error occurs while retrieving the job.</response>
 		[HttpGet("GetById/{id}")]
 		public IActionResult GetById(string id)
 		{
-			var job = _jobRepository.GetByProperty(Job => Job.Id == id, j => j.JobFiles, j => j.JobBenefits, j => j.JobSkills);
+			var job = _jobRepo.GetJobWithDetails(Job => Job.Id == id);
 			if (job == null)
 				return NotFound("Job not found");
 
 			return Ok(_mapper.Map<JobModel>(job));
 		}
-
+		/// <summary>
+		/// Adds a new job to the database.
+		/// </summary>
+		/// <param name="jobModel">The job data to add.</param>
+		/// <returns></returns>
+		/// <response code="201">The job was successfully created.</response>
+		/// <response code="400">The provided job model is invalid.</response>
+		/// <response code="409">A job with the same title already exists.</response>
+		/// <response code="500">If an internal server error occurs while processing the request.</response>
 		[HttpPost]
+		[SwaggerRequestExample(typeof(JobModel), typeof(JobExampleDocumentation))]
 		public IActionResult Post([FromBody] JobModel jobModel)
 		{
-
-			if (!ModelState.IsValid)
-				return BadRequest(ModelState);
-
-			var job = _mapper.Map<Job>(jobModel);
-			job.Id = Guid.NewGuid().ToString();
-
-			if (_jobRepository.GetByProperty(jb => jb.Title == jobModel.Title) != null)
-				return Conflict("Job already exists");
-
-			foreach (var jb in job.JobBenefits)
+			try
 			{
-				jb.Id = Guid.NewGuid().ToString();
-				jb.JobId = job.Id;
+				if (!ModelState.IsValid)
+					return BadRequest(ModelState);
 
+				if (_jobRepo.GetJobWithDetails(jb => jb.Title == jobModel.Title) != null)
+					return Conflict("Job already exists");
+
+				JobModel jobToReturn = _IJobProcessor.ProcessAddJob(jobModel);
+
+				return CreatedAtAction(nameof(Post), new { id = jobToReturn.Id }, jobModel);
 			}
-
-			foreach (var js in job.JobSkills)
+			catch (Exception ex)
 			{
-				js.Id = Guid.NewGuid().ToString();
-				js.JobId = job.Id;
+				return BadRequest(ex.Message);
 			}
-
-			foreach (var jf in job.JobFiles)
-			{
-
-				jf.Id = Guid.NewGuid().ToString();
-				jf.JobId = job.Id;
-			}
-
-			_jobRepository.Add(job);
-			_jobRepository.Commit();
-
-			var resultModel = _mapper.Map<JobModel>(job);
-			return CreatedAtAction(nameof(Get), new { title = job.Title }, resultModel);
-
 		}
-
+		/// <summary>
+		/// Updates an existing job based on its ID.
+		/// </summary>
+		/// <param name="id">The unique identifier of the job to update.</param>
+		/// <param name="jobModel">The updated job data.</param>
+		/// <returns></returns>
+		/// <response code="200">The job was successfully updated.</response>
+		/// <response code="400">The provided job model is invalid.</response>
+		/// <response code="404">The job with the specified ID was not found.</response>
+		/// <response code="500">If an internal server error occurs while processing the request.</response>
 		[HttpPut("{id}")]
 		public IActionResult Put(string id, [FromBody] JobModel jobModel)
 		{
-			if (!ModelState.IsValid)
-				return BadRequest(ModelState);
+			try
+			{
+				if (!ModelState.IsValid)
+					return BadRequest(ModelState);
 
-			var existingJob = _jobRepository.GetByProperty(jb => jb.Id == id, jb => jb.JobBenefits, jb => jb.JobFiles, jb => jb.JobSkills);
-			if (existingJob == null)
-				return NotFound($"Job with ID {id} not found");
+				var existingJob = _jobRepo.GetJobWithDetails(jb => jb.Id == id);
+				if (existingJob == null)
+					return NotFound($"Job with ID {id} not found");
 
+				JobModel jobToReturn = _IJobProcessor.ProcessUpdateJob(id, jobModel);
 
-			var updatedJob = _mapper.Map<JobModel, Job>(jobModel, existingJob);
-
-			_jobRepository.Update(updatedJob);
-			_jobRepository.Commit();
-
-			//	var updatedJobModel = _mapper.Map<JobModel>(existingJob);
-			return Ok();
+				return Ok(_mapper.Map<JobModel>(jobToReturn));
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
 		}
+
+		/// <summary>
+		/// Deletes a specific job by its ID.
+		/// </summary>
+		/// <param name="id">The unique identifier of the job to delete.</param>
+		/// <returns></returns>
+		/// <response code="200">The job was successfully deleted.</response>
+		/// <response code="400">The job cannot be deleted because it is used in another table.</response>
+		/// <response code="404">The job with the specified ID was not found.</response>
+		/// <response code="500">If an internal server error occurs while processing the request.</response>
 		[HttpDelete("{id}")]
 		public IActionResult Delete(string id)
 		{
 
-			var job = _jobRepository.GetByProperty(f => f.Id == id, jb => jb.JobBenefits, jb => jb.JobFiles, jb => jb.JobSkills);
+			var job = _jobRepo.GetJobWithDetails(f => f.Id == id);
 			if (job == null)
 			{
 				return NotFound("Job not found");
@@ -127,7 +158,7 @@ namespace InterviewPass.WebApi.Controllers
 			{
 				return BadRequest("The job is used in another table");
 			}
-			_jobRepository.Delete(job);
+			_jobRepo.DeleteJob(job);
 			return Ok();
 		}
 

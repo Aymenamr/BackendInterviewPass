@@ -4,7 +4,7 @@ namespace InterviewPass.WebApi.Models
 {
 	public class JobModel
 	{
-		public string Id { get; set; }
+		public string? Id { get; set; }
 
 		[StringLength(100, ErrorMessage = "Title can't be longer than 100 characters.")]
 		public string? Title { get; set; }
@@ -26,12 +26,10 @@ namespace InterviewPass.WebApi.Models
 
 		[Range(0, double.MaxValue, ErrorMessage = "Salary must be a positive number.")]
 		public double? Salary { get; set; }
-
 		public string? EmploymentTypeId { get; set; }
-		//public EmploymentTypeModel? EmploymentType { get; set; }
-		public List<JobFileModel>? JobFiles { get; set; } = new List<JobFileModel>();
-		public List<JobBenefitModel>? JobBenefits { get; set; } = new List<JobBenefitModel>();
-		public List<JobSkillModel>? JobSkills { get; set; } = new List<JobSkillModel>();
+		public List<string> Skills { get; set; } = new List<string>();
+		public List<string> Benefits { get; set; } = new List<string>();
+		public List<string> Files { get; set; } = new List<string>();
 
 
 	}

@@ -40,39 +40,33 @@ namespace InterviewPass.WebApi.Mapper
 			CreateMap<PracticalQuestion, PracticalQuestionModel>().ReverseMap();
 			CreateMap<ObjectiveQuestion, ObjectiveQuestionModel>().ReverseMap();
 			CreateMap<Possibility, PossibilityModel>().ReverseMap();
-
-
 			CreateMap<EmploymentType, EmploymentTypeModel>().ReverseMap();
-			CreateMap<JobFile, JobFileModel>().ReverseMap();
-			//.ForMember(dest => dest.Id, opt => opt.Ignore());
-			CreateMap<JobSkill, JobSkillModel>().ReverseMap();
-			//.ForMember(dest => dest.Id, opt => opt.Ignore());
-			CreateMap<JobBenefit, JobBenefitModel>().ReverseMap();
-			//.ForMember(dest => dest.Id, opt => opt.Ignore());
-			CreateMap<Job, JobModel>().ReverseMap()
-			.ForMember(dest => dest.JobBenefits, opt => opt.MapFrom(src =>
-				src.JobBenefits.Select(b => new JobBenefit
-				{
-					BenefitId = b.BenefitId,
-					JobId = b.JobId
-				})))
-			.ForMember(dest => dest.JobSkills, opt => opt.MapFrom(src =>
-				src.JobSkills.Select(s => new JobSkill
-				{
-					SkillId = s.SkillId,
-					JobId = s.JobId
-				})))
-			.ReverseMap()
-			.ForMember(dest => dest.JobFiles, opt => opt.MapFrom(src =>
-				src.JobFiles.Select(f => new JobFile
-				{
-					FileName = f.FileName,
-					FilePath = f.FilePath,
-					JobId = f.JobId
-				})))
-			.ReverseMap();
+			CreateMap<JobModel, Job>()
+			.ForMember(dest => dest.Id, opt => opt.Ignore());
+			CreateMap<Job, JobModel>()
+				.ForMember(dest => dest.Skills,
+				opt => opt.MapFrom(src => src.JobSkills != null
+			? src.JobSkills
+				.Where(js => js.Skill != null)
+				.Select(js => js.Skill.Name)
+				.ToList()
+			: new List<string>()))
 
+	.ForMember(dest => dest.Benefits,
+		opt => opt.MapFrom(src => src.JobBenefits != null
+			? src.JobBenefits
+				.Where(jb => jb.Benefit != null)
+				.Select(jb => jb.Benefit.Name)
+				.ToList()
+			: new List<string>()))
 
+	.ForMember(dest => dest.Files,
+		opt => opt.MapFrom(src => src.JobFiles != null
+			? src.JobFiles
+				.Where(jf => jf.File != null)
+				.Select(jf => Convert.ToBase64String(jf.File))
+				.ToList()
+			: new List<string>()));
 
 		}
 	}

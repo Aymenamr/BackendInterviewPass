@@ -7,6 +7,6 @@
 
 		public virtual Job? Job { get; set; }
 		public string? BenefitId { get; set; }
-		public virtual Benefits? Benefits { get; set; }
+		public virtual Benefits? Benefit { get; set; }
 	}
 }

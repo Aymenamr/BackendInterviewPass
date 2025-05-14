@@ -36,10 +36,10 @@ CREATE TABLE "JobBenefit" (
 CREATE TABLE "JobFile" (
 	"Id"	TEXT,
 	"JobId"	TEXT,
-	"FilePath"	TEXT,
 	"FileName"	TEXT,
-	PRIMARY KEY("Id"),
-	FOREIGN KEY("JobId") REFERENCES "Job"("Id")
+	"File"	BLOB,
+	FOREIGN KEY("JobId") REFERENCES "Job"("Id"),
+	PRIMARY KEY("Id")
 );
 
 CREATE INDEX "IX_Job_Title" ON "Job" (

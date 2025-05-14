@@ -285,7 +285,7 @@ public partial class InterviewPassContext : DbContext
 			entity.HasOne(e => e.Job).WithMany(d => d.JobBenefits).HasForeignKey(d => d.JobId)
 			.OnDelete(DeleteBehavior.Restrict);
 
-			entity.HasOne(d => d.Benefits).WithMany(d => d.JobBenefits).HasForeignKey(d => d.BenefitId)
+			entity.HasOne(d => d.Benefit).WithMany(d => d.JobBenefits).HasForeignKey(d => d.BenefitId)
 			.OnDelete(DeleteBehavior.Restrict);
 
 
@@ -316,7 +316,7 @@ public partial class InterviewPassContext : DbContext
 			entity.ToTable("JobFile");
 
 			entity.Property(e => e.Id).HasColumnType("STRING").IsRequired();
-			entity.Property(e => e.FilePath).HasColumnType("STRING");
+			entity.Property(e => e.File).HasColumnType("varbinary(max)");
 			entity.Property(e => e.FileName).HasColumnType("STRING").IsRequired(false);
 			entity.Property(e => e.JobId).HasColumnType("STRING").IsRequired(false);
 

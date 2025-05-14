@@ -9,6 +9,6 @@ namespace InterviewPass.WebApi.Models
 		[StringLength(100, ErrorMessage = "Benefit Name can't be longer than 100 characters.")]
 		public string? Name { get; set; }
 
-		public List<JobBenefitModel> JobBenefits { get; set; } = new List<JobBenefitModel>();
+		//public List<JobBenefitModel> JobBenefits { get; set; } = new List<JobBenefitModel>();
 	}
 }
