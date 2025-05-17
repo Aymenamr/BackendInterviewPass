@@ -28,7 +28,7 @@ namespace InterviewPass.WebApi.Examples
                     Questions = new List<QuestionModel> {
                         new MultipleChoiceQuestionModel {
                             Id = null,
-                            Score=10,
+                            Score=2,
                             Content = "which is a C# framework",
                             HasSignleChoice=true,
                             SkillId= Guid.NewGuid().ToString(),
@@ -50,22 +50,8 @@ namespace InterviewPass.WebApi.Examples
                             SkillId= Guid.NewGuid().ToString(),
                             Score=5
 
-                            },
-                        new PracticalQuestionModel
-                        {
-                            Id = null,
-                            SkillId= Guid.NewGuid().ToString(),
-                            Content="Practical Question content",
-                            Score=20
-                        },
-                        new ObjectiveQuestionModel
-                        {
-                            Id = null,
-                            SkillId= Guid.NewGuid().ToString(),
-                            Content="Objective Question content",
-                            Score=20
-                        } }
-
+                            }
+                    }
                 });
         }
     }
