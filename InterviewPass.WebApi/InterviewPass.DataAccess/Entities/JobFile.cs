@@ -3,7 +3,7 @@
 	public partial class JobFile
 	{
 		public string Id { get; set; } = null!;
-		public string? FilePath { get; set; }
+		public byte[]? File { get; set; }
 		public string? FileName { get; set; }
 
 		public string? JobId { get; set; }
