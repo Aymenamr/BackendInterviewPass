@@ -1,4 +1,8 @@
-﻿using InterviewPass.WebApi.Models;
+﻿using AutoMapper;
+using InterviewPass.DataAccess.Entities;
+using InterviewPass.DataAccess.Repositories.Interfaces;
+using InterviewPass.WebApi.Models;
+using InterviewPass.WebApi.Processors;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -7,8 +11,17 @@ namespace InterviewPass.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AnswersController : ControllerBase
+    public class AnswerController : ControllerBase
     {
+        private readonly ILogger<AnswerController> _logger;
+        private readonly IAnswerProcessor _answerProcessor;
+
+        public AnswerController(ILogger<AnswerController> logger, IAnswerProcessor answerProcessor)
+        {
+            _logger = logger;
+            _answerProcessor = answerProcessor;
+        }
+
         // GET: api/<AnswersController>
         [HttpGet]
         public IEnumerable<string> Get()
@@ -25,8 +38,9 @@ namespace InterviewPass.WebApi.Controllers
 
         // POST api/<AnswersController>
         [HttpPost]
-        public void Post([FromBody] AnswerModel value)
+        public void Post([FromBody] AnswerModel answer)
         {
+            _answerProcessor.ProcessAnswer(answer);
         }
 
         // PUT api/<AnswersController>/5

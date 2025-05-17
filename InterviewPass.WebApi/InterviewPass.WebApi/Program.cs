@@ -72,6 +72,7 @@ builder.Services.AddTransient<DbContext, InterviewPassContext>();
 builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IExamProcessor, ExamProcessor>();
+builder.Services.AddTransient<IAnswerProcessor, AnswerProcessor>();
 builder.Services.AddTransient<JobSeekerRepository>();
 builder.Services.AddTransient<HrRepository>();
 builder.Services.AddTransient<Func<string, IUserRepository>>(serviceProvider => key =>
