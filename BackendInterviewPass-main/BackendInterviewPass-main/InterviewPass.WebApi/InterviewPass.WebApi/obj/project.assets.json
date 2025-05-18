@@ -1,0 +1,86 @@
+{
+  "version": 3,
+  "targets": {
+    "net8.0": {
+      "InterviewPass.DataAccess/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/InterviewPass.DataAccess.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/InterviewPass.DataAccess.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "InterviewPass.DataAccess/1.0.0": {
+      "type": "project",
+      "path": "../InterviewPass.DataAccess/InterviewPass.DataAccess.csproj",
+      "msbuildProject": "../InterviewPass.DataAccess/InterviewPass.DataAccess.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net8.0": [
+      "InterviewPass.DataAccess >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\IbrahemJB\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\IbrahemJB\\OneDrive\\سطح المكتب\\C# asp.net fullstack\\BackendInterviewPass-main\\BackendInterviewPass-main\\InterviewPass.WebApi\\InterviewPass.WebApi\\InterviewPass.WebApi.csproj",
+      "projectName": "InterviewPass.WebApi",
+      "projectPath": "C:\\Users\\IbrahemJB\\OneDrive\\سطح المكتب\\C# asp.net fullstack\\BackendInterviewPass-main\\BackendInterviewPass-main\\InterviewPass.WebApi\\InterviewPass.WebApi\\InterviewPass.WebApi.csproj",
+      "packagesPath": "C:\\Users\\IbrahemJB\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\IbrahemJB\\OneDrive\\سطح المكتب\\C# asp.net fullstack\\BackendInterviewPass-main\\BackendInterviewPass-main\\InterviewPass.WebApi\\InterviewPass.WebApi\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\IbrahemJB\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net8.0"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "projectReferences": {
+            "C:\\Users\\IbrahemJB\\OneDrive\\سطح المكتب\\C# asp.net fullstack\\BackendInterviewPass-main\\BackendInterviewPass-main\\InterviewPass.WebApi\\InterviewPass.DataAccess\\InterviewPass.DataAccess.csproj": {
+              "projectPath": "C:\\Users\\IbrahemJB\\OneDrive\\سطح المكتب\\C# asp.net fullstack\\BackendInterviewPass-main\\BackendInterviewPass-main\\InterviewPass.WebApi\\InterviewPass.DataAccess\\InterviewPass.DataAccess.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net8.0": {
+        "targetAlias": "net8.0",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.401\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
