@@ -10,7 +10,7 @@ namespace InterviewPass.DataAccess.UnitOfWork
 		public IGenericRepository<Exam> ExamRepo { get; }
 		public IGenericRepository<Question> QuestionRepo { get; }
 		public IGenericRepository<Possibility> PossibilityRepo { get; }
-		//public IGenericRepository<Job> JobRepo { get; }
+		public IGenericRepository<Job> JobRepo { get; }
 		public IGenericRepository<Skill> SkillRepo { get; }
 		public IGenericRepository<JobBenefit> JobBenefitRepo { get; }
 		public IGenericRepository<JobFile> JobFileRepo { get; }
@@ -25,7 +25,7 @@ namespace InterviewPass.DataAccess.UnitOfWork
 			ExamRepo = new GenericRepository<Exam>(_dbContext);
 			QuestionRepo = new GenericRepository<Question>(_dbContext);
 			PossibilityRepo = new GenericRepository<Possibility>(_dbContext);
-			//JobRepo = new GenericRepository<Job>(_dbContext);
+			JobRepo = new GenericRepository<Job>(_dbContext);
 			SkillRepo = new GenericRepository<Skill>(_dbContext);
 			JobBenefitRepo = new GenericRepository<JobBenefit>(_dbContext);
 			JobFileRepo = new GenericRepository<JobFile>(_dbContext);

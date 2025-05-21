@@ -42,8 +42,13 @@ namespace InterviewPass.WebApi.Mapper
 			CreateMap<Possibility, PossibilityModel>().ReverseMap();
 			CreateMap<EmploymentType, EmploymentTypeModel>().ReverseMap();
 			CreateMap<JobModel, Job>()
-			.ForMember(dest => dest.Id, opt => opt.Ignore());
+			.ForMember(dest => dest.Id, opt => opt.Ignore())
+			  .ForMember(dest => dest.Image, opt => opt.MapFrom(src =>
+		!string.IsNullOrEmpty(src.Image) ? Convert.FromBase64String(src.Image) : null));
+
 			CreateMap<Job, JobModel>()
+				.ForMember(dest => dest.Image, opt => opt.MapFrom(src =>
+				src.Image != null ? Convert.ToBase64String(src.Image) : null))
 				.ForMember(dest => dest.Skills,
 				opt => opt.MapFrom(src => src.JobSkills != null
 			? src.JobSkills

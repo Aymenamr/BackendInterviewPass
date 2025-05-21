@@ -14,19 +14,19 @@ namespace InterviewPass.WebApi.Controllers
 	public class JobController : ControllerBase
 	{
 		private readonly ILogger<JobController> _logger;
-		//private readonly IGenericRepository<Job> _jobRepository;
-		private readonly IJobRepository _jobRepo;
+		private readonly IGenericRepository<Job> _jobRepository;
+		//private readonly IJobRepository _jobRepo;
 		private readonly IJobProcessor _IJobProcessor;
 
 
 		private readonly IMapper _mapper;
-		public JobController(ILogger<JobController> logger, IJobProcessor IJobProcessor, IGenericRepository<Job> jobRepository, IJobRepository jobRepo, IMapper mapper)
+		public JobController(ILogger<JobController> logger, IJobProcessor IJobProcessor, IGenericRepository<Job> jobRepository, IMapper mapper)
 		{
 			_logger = logger;
-			//_jobRepository = jobRepository;
+			_jobRepository = jobRepository;
 			_mapper = mapper;
 			_IJobProcessor = IJobProcessor;
-			_jobRepo = jobRepo;
+			//	_jobRepo = jobRepo;
 		}
 		/// <summary>
 		/// return the list of all jobs .
@@ -37,7 +37,7 @@ namespace InterviewPass.WebApi.Controllers
 		[HttpGet]
 		public IActionResult GetJobs()
 		{
-			return Ok(_mapper.Map<List<JobModel>>(_jobRepo.GetAllWithDetails()));
+			return Ok(_mapper.Map<List<JobModel>>(_jobRepository.GetAll()));
 		}
 		/// <summary>
 		/// Retrieves a specific job by its title.
@@ -50,11 +50,12 @@ namespace InterviewPass.WebApi.Controllers
 		[HttpGet("{title}")]
 		public IActionResult Get(string title)
 		{
-			var job = _jobRepo.GetJobWithDetails(Job => Job.Title == title);
+			var job = _jobRepository.GetByProperty(Job => Job.Title == title, j => j.JobBenefits, j => j.JobSkills, j => j.JobFiles);
 			if (job == null)
 				return NotFound("Job not found");
-
-			return Ok(_mapper.Map<JobModel>(job));
+			JobModel jobmodel = _mapper.Map<JobModel>(job);
+			_IJobProcessor.getJobWithDetails(jobmodel);
+			return Ok(jobmodel);
 		}
 		/// <summary>
 		/// Retrieves a specific job by its unique id.
@@ -67,11 +68,13 @@ namespace InterviewPass.WebApi.Controllers
 		[HttpGet("GetById/{id}")]
 		public IActionResult GetById(string id)
 		{
-			var job = _jobRepo.GetJobWithDetails(Job => Job.Id == id);
+			var job = _jobRepository.GetByProperty(Job => Job.Id == id, j => j.JobBenefits, j => j.JobSkills, j => j.JobFiles);
 			if (job == null)
 				return NotFound("Job not found");
 
-			return Ok(_mapper.Map<JobModel>(job));
+			JobModel jobmodel = _mapper.Map<JobModel>(job);
+			_IJobProcessor.getJobWithDetails(jobmodel);
+			return Ok(jobmodel);
 		}
 		/// <summary>
 		/// Adds a new job to the database.
@@ -86,22 +89,12 @@ namespace InterviewPass.WebApi.Controllers
 		[SwaggerRequestExample(typeof(JobModel), typeof(JobExampleDocumentation))]
 		public IActionResult Post([FromBody] JobModel jobModel)
 		{
-			try
-			{
-				if (!ModelState.IsValid)
-					return BadRequest(ModelState);
+			if (_jobRepository.GetByProperty(jb => jb.Title == jobModel.Title) != null)
+				return Conflict("Job already exists");
 
-				if (_jobRepo.GetJobWithDetails(jb => jb.Title == jobModel.Title) != null)
-					return Conflict("Job already exists");
+			JobModel jobToReturn = _IJobProcessor.ProcessAddJob(jobModel);
 
-				JobModel jobToReturn = _IJobProcessor.ProcessAddJob(jobModel);
-
-				return CreatedAtAction(nameof(Post), new { id = jobToReturn.Id }, jobModel);
-			}
-			catch (Exception ex)
-			{
-				return BadRequest(ex.Message);
-			}
+			return CreatedAtAction(nameof(Post), new { id = jobToReturn.Id }, jobModel);
 		}
 		/// <summary>
 		/// Updates an existing job based on its ID.
@@ -116,23 +109,13 @@ namespace InterviewPass.WebApi.Controllers
 		[HttpPut("{id}")]
 		public IActionResult Put(string id, [FromBody] JobModel jobModel)
 		{
-			try
-			{
-				if (!ModelState.IsValid)
-					return BadRequest(ModelState);
+			var existingJob = _jobRepository.GetByProperty(jb => jb.Id == id);
+			if (existingJob == null)
+				return NotFound($"Job with ID {id} not found");
 
-				var existingJob = _jobRepo.GetJobWithDetails(jb => jb.Id == id);
-				if (existingJob == null)
-					return NotFound($"Job with ID {id} not found");
+			JobModel jobToReturn = _IJobProcessor.ProcessUpdateJob(id, jobModel);
 
-				JobModel jobToReturn = _IJobProcessor.ProcessUpdateJob(id, jobModel);
-
-				return Ok(_mapper.Map<JobModel>(jobToReturn));
-			}
-			catch (Exception ex)
-			{
-				return BadRequest(ex.Message);
-			}
+			return Ok(_mapper.Map<JobModel>(jobToReturn));
 		}
 
 		/// <summary>
@@ -148,7 +131,7 @@ namespace InterviewPass.WebApi.Controllers
 		public IActionResult Delete(string id)
 		{
 
-			var job = _jobRepo.GetJobWithDetails(f => f.Id == id);
+			var job = _jobRepository.GetByProperty(f => f.Id == id);
 			if (job == null)
 			{
 				return NotFound("Job not found");
@@ -158,7 +141,7 @@ namespace InterviewPass.WebApi.Controllers
 			{
 				return BadRequest("The job is used in another table");
 			}
-			_jobRepo.DeleteJob(job);
+			_jobRepository.Delete(job);
 			return Ok();
 		}
 

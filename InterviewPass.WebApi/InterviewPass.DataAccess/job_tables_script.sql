@@ -2,15 +2,14 @@ CREATE TABLE "Job" (
 	"Id"	TEXT,
 	"Title"	TEXT,
 	"ShortDescription"	TEXT,
-	"ImagePath"	TEXT,
+	"Image"	BLOB,
 	"EmploymentTypeId"	TEXT,
 	"experience"	INTEGER,
 	"WorkingSchedule"	TEXT,
 	"Role"	TEXT,
 	"Salary"	REAL,
-	PRIMARY KEY("Id"),
-	FOREIGN KEY("SkillId") REFERENCES "Skill"("Id"),
-	FOREIGN KEY("EmploymentTypeId") REFERENCES "EmploymentType"("Id")
+	FOREIGN KEY("EmploymentTypeId") REFERENCES "EmploymentType"("Id"),
+	PRIMARY KEY("Id")
 );
 
 CREATE TABLE "EmploymentType" (

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Infrastructure.Exceptions;
 using InterviewPass.DataAccess.Entities;
-using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.DataAccess.UnitOfWork;
 using InterviewPass.WebApi.Models;
 
@@ -9,15 +9,41 @@ namespace InterviewPass.WebApi.Processors
 	public class JobProcessor : IJobProcessor
 	{
 		private readonly IUnitOfWork _unitOfWork;
-		private readonly IJobRepository _jobRepo;
 		private readonly IMapper _mapper;
 
-		public JobProcessor(IUnitOfWork unitOfWork, IJobRepository jobRepo, IMapper mapper)
+		public JobProcessor(IUnitOfWork unitOfWork, IMapper mapper)
 		{
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
-			_jobRepo = jobRepo;
+		}
 
+		public JobModel getJobWithDetails(JobModel jobModel)
+		{
+			var skillIds = _unitOfWork.JobSkillRepo.GetAll()
+				.Where(js => js.JobId == jobModel.Id)
+				.Select(js => js.SkillId)
+				.ToList();
+
+
+			var skillNames = _unitOfWork.SkillRepo.GetAll()
+				.Where(s => skillIds.Contains(s.Id))
+				.Select(s => s.Name)
+				.ToList();
+
+			var BenefitIds = _unitOfWork.JobBenefitRepo.GetAll()
+				.Where(js => js.JobId == jobModel.Id)
+				.Select(js => js.BenefitId)
+				.ToList();
+
+
+			var benefitNames = _unitOfWork.BenefitRepo.GetAll()
+				.Where(s => BenefitIds.Contains(s.Id))
+				.Select(s => s.Name)
+				.ToList();
+
+			jobModel.Skills = skillNames;
+			jobModel.Benefits = benefitNames;
+			return jobModel;
 		}
 		public JobModel ProcessAddJob(JobModel jobModel)
 		{
@@ -25,18 +51,18 @@ namespace InterviewPass.WebApi.Processors
 			var job = _mapper.Map<Job>(jobModel);
 
 			var skills = _unitOfWork.SkillRepo.GetAll()
-				.Where(s => jobModel.Skills.Contains(s.Name)).ToList();
+			.Where(s => jobModel.Skills.Contains(s.Name)).ToList();
 
 			var missingSkills = jobModel.Skills.Except(skills.Select(s => s.Name)).ToList();
 			if (missingSkills.Any())
-				throw new Exception($"The following skills are missing in the database: {string.Join(", ", missingSkills)}. Please add them to the Skills table.");
+				throw new NotFoundException($"The following skills are missing in the database: {string.Join(", ", missingSkills)}. Please add them to the Skills table.");
 
 
 			job.JobSkills = skills.Select(skill => new JobSkill
 			{
 				Id = Guid.NewGuid().ToString(),
 				JobId = job.Id,
-				SkillId = skill.Id
+				SkillId = skill.Id,
 			}).ToList();
 
 			var benefits = _unitOfWork.BenefitRepo.GetAll()
@@ -44,7 +70,7 @@ namespace InterviewPass.WebApi.Processors
 
 			var missingBenefits = jobModel.Benefits.Except(benefits.Select(b => b.Name)).ToList();
 			if (missingBenefits.Any())
-				throw new Exception($"The following benefits are missing in the database: {string.Join(", ", missingBenefits)}. Please add them to the Benefits table.");
+				throw new NotFoundException($"The following benefits are missing in the database: {string.Join(", ", missingBenefits)}. Please add them to the Benefits table.");
 
 
 			job.JobBenefits = benefits.Select(b => new JobBenefit
@@ -59,10 +85,10 @@ namespace InterviewPass.WebApi.Processors
 				Id = Guid.NewGuid().ToString(),
 				JobId = job.Id,
 				File = Convert.FromBase64String(b64),
-				FileName = ""
+				FileName = $"job_{job.Id}_{DateTime.UtcNow:yyyyMMdd_HHmmss}"
 			}).ToList();
 
-			_jobRepo.AddJob(job);
+			_unitOfWork.JobRepo.Add(job);
 			_unitOfWork.Save();
 
 			return _mapper.Map<JobModel>(job);
@@ -71,7 +97,9 @@ namespace InterviewPass.WebApi.Processors
 
 		public JobModel ProcessUpdateJob(string id, JobModel jobModel)
 		{
-			var existingJob = _jobRepo.GetJobWithDetails(j => j.Id == id);
+			var existingJob = _unitOfWork.JobRepo.GetByProperty(j => j.Id == id, j => j.JobSkills, j => j.JobBenefits, j => j.JobFiles);
+			var skillIds = existingJob.JobSkills.Select(js => js.SkillId).ToList();
+			var benefitIds = existingJob.JobBenefits.Select(jb => jb.BenefitId).ToList();
 
 			_mapper.Map(jobModel, existingJob);
 
@@ -83,7 +111,7 @@ namespace InterviewPass.WebApi.Processors
 
 			var missingSkills = jobModel.Skills.Except(selectedSkills.Select(s => s.Name)).ToList();
 			if (missingSkills.Any())
-				throw new Exception($"The following skills are missing in the database: {string.Join(", ", missingSkills)}. Please add them first.");
+				throw new NotFoundException($"The following skills are missing in the database: {string.Join(", ", missingSkills)}. Please add them first.");
 
 			var toRemove = existingJob.JobSkills
 				.Where(js => !selectedSkills.Any(s => s.Id == js.SkillId))
@@ -92,6 +120,7 @@ namespace InterviewPass.WebApi.Processors
 			foreach (var item in toRemove)
 			{
 				existingJob.JobSkills.Remove(item);
+				_unitOfWork.JobSkillRepo.Delete(item);
 			}
 
 			foreach (var skill in selectedSkills)
@@ -116,7 +145,7 @@ namespace InterviewPass.WebApi.Processors
 			var missingBenefits = jobModel.Benefits.Except(selectedBenefits.Select(b => b.Name)).ToList();
 
 			if (missingBenefits.Any())
-				throw new Exception($"The following benefits are missing in the database: {string.Join(", ", missingBenefits)}. Please add them first.");
+				throw new NotFoundException($"The following benefits are missing in the database: {string.Join(", ", missingBenefits)}. Please add them first.");
 
 			var benefitsToRemove = existingJob.JobBenefits
 				.Where(js => !selectedBenefits.Any(s => s.Id == js.BenefitId))
@@ -125,6 +154,8 @@ namespace InterviewPass.WebApi.Processors
 			foreach (var item in benefitsToRemove)
 			{
 				existingJob.JobBenefits.Remove(item);
+				_unitOfWork.JobBenefitRepo.Delete(item);
+
 			}
 
 			foreach (var benefit in selectedBenefits)
@@ -140,20 +171,22 @@ namespace InterviewPass.WebApi.Processors
 				}
 			}
 
-
-			existingJob.JobFiles.Clear();
+			var filesToRemove = existingJob.JobFiles.ToList();
+			foreach (var file in filesToRemove)
+			{
+				_unitOfWork.JobFileRepo.Delete(file);
+			}
 
 			existingJob.JobFiles = jobModel.Files.Select(b64 => new JobFile
 			{
 				Id = Guid.NewGuid().ToString(),
 				JobId = existingJob.Id,
 				File = Convert.FromBase64String(b64),
-				FileName = ""
+				FileName = $"job_{existingJob.Id}_{DateTime.UtcNow:yyyyMMdd_HHmmss}"
 			}).ToList();
 
-			_jobRepo.UpdateJob(existingJob);
+			_unitOfWork.JobRepo.Update(existingJob);
 			_unitOfWork.Save();
-			existingJob = _jobRepo.GetJobWithDetails(j => j.Id == existingJob.Id);
 
 			return _mapper.Map<JobModel>(existingJob);
 		}

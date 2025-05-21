@@ -11,9 +11,7 @@ namespace InterviewPass.WebApi.Models
 
 		[StringLength(500, ErrorMessage = "Short Description can't be longer than 500 characters.")]
 		public string? ShortDescription { get; set; }
-
-		[StringLength(255, ErrorMessage = "Image Path can't be longer than 255 characters.")]
-		public string? ImagePath { get; set; }
+		public string? Image { get; set; }
 
 		[Range(1, 30, ErrorMessage = "Experience must be a positive number.")]
 		public int? Experience { get; set; }

@@ -15,7 +15,7 @@ namespace InterviewPass.WebApi.Examples
 						   Id = null,
 						   Title = "Senior Backend Developer",
 						   ShortDescription = "Develop and maintain APIs for the platform.",
-						   ImagePath = "images/backend-dev.png",
+						   Image = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO7+Ar0AAAAASUVORK5CYII=",
 						   Experience = 5,
 						   WorkingSchedule = "Full-time",
 						   Role = "Team Lead",

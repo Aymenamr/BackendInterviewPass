@@ -242,7 +242,7 @@ public partial class InterviewPassContext : DbContext
 			entity.Property(e => e.Id).HasColumnType("STRING");
 			entity.Property(e => e.Title).HasColumnType("STRING");
 			entity.Property(e => e.ShortDescription).HasColumnType("STRING");
-			entity.Property(e => e.ImagePath).HasColumnType("STRING");
+			entity.Property(e => e.Image).HasColumnType("varbinary(max)");
 			entity.Property(e => e.Experience).HasColumnType("INTEGER");
 			entity.Property(e => e.WorkingSchedule).HasColumnType("STRING");
 			entity.Property(e => e.Role).HasColumnType("STRING");

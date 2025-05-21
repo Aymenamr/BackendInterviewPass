@@ -75,7 +75,7 @@ builder.Services.AddTransient<IExamProcessor, ExamProcessor>();
 builder.Services.AddTransient<IJobProcessor, JobProcessor>();
 builder.Services.AddTransient<JobSeekerRepository>();
 builder.Services.AddTransient<HrRepository>();
-builder.Services.AddScoped<IJobRepository, JobRepository>();
+//builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddTransient<Func<string, IUserRepository>>(serviceProvider => key =>
 {
 	return key switch
