@@ -9,6 +9,12 @@ namespace InterviewPass.DataAccess.UnitOfWork
 		IGenericRepository<Possibility> PossibilityRepo { get; }
 		IGenericRepository<Question> QuestionRepo { get; }
 		IGenericRepository<Job> JobRepo { get; }
+		IGenericRepository<Skill> SkillRepo { get; }
+		IGenericRepository<JobBenefit> JobBenefitRepo { get; }
+		IGenericRepository<JobFile> JobFileRepo { get; }
+		IGenericRepository<JobSkill> JobSkillRepo { get; }
+		IGenericRepository<Benefits> BenefitRepo { get; }
+
 		void Save();
 	}
 }

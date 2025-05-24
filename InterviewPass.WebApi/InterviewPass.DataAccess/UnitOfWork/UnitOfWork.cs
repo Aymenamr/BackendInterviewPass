@@ -11,6 +11,11 @@ namespace InterviewPass.DataAccess.UnitOfWork
 		public IGenericRepository<Question> QuestionRepo { get; }
 		public IGenericRepository<Possibility> PossibilityRepo { get; }
 		public IGenericRepository<Job> JobRepo { get; }
+		public IGenericRepository<Skill> SkillRepo { get; }
+		public IGenericRepository<JobBenefit> JobBenefitRepo { get; }
+		public IGenericRepository<JobFile> JobFileRepo { get; }
+		public IGenericRepository<JobSkill> JobSkillRepo { get; }
+		public IGenericRepository<Benefits> BenefitRepo { get; }
 
 		private readonly DbContext _dbContext;
 
@@ -21,6 +26,11 @@ namespace InterviewPass.DataAccess.UnitOfWork
 			QuestionRepo = new GenericRepository<Question>(_dbContext);
 			PossibilityRepo = new GenericRepository<Possibility>(_dbContext);
 			JobRepo = new GenericRepository<Job>(_dbContext);
+			SkillRepo = new GenericRepository<Skill>(_dbContext);
+			JobBenefitRepo = new GenericRepository<JobBenefit>(_dbContext);
+			JobFileRepo = new GenericRepository<JobFile>(_dbContext);
+			BenefitRepo = new GenericRepository<Benefits>(_dbContext);
+			JobSkillRepo = new GenericRepository<JobSkill>(_dbContext);
 		}
 
 		public void Save()

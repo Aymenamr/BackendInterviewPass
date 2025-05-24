@@ -5,7 +5,7 @@
 		public string Id { get; set; } = null!;
 		public string? Title { get; set; }
 		public string? ShortDescription { get; set; }
-		public string? ImagePath { get; set; }
+		public byte[]? Image { get; set; }
 		public int? Experience { get; set; }
 		public string? WorkingSchedule { get; set; }
 		public string? Role { get; set; }
