@@ -86,9 +86,17 @@ builder.Services.AddTransient<Func<string, IUserRepository>>(serviceProvider => 
 		_ => throw new KeyNotFoundException("Service not found.")
 	};
 });
+builder.Services
+    .AddCors(options =>
+    {
+        options.AddPolicy("AllowOrigin",
+            builder => builder.WithOrigins("http://localhost:4200")
+                              .AllowAnyHeader()
+                              .AllowAnyMethod());
+    });  
 
-var app = builder.Build();
-
+var app = builder.Build(); 
+app.UseCors("AllowOrigin");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
