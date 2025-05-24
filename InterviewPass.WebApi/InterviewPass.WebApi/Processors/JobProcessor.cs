@@ -17,7 +17,7 @@ namespace InterviewPass.WebApi.Processors
 			_mapper = mapper;
 		}
 
-		public JobModel GJob(JobModel jobModel)
+		public JobModel GetJob(JobModel jobModel)
 		{
 			var skillIds = _unitOfWork.JobSkillRepo.GetAll()
 				.Where(js => js.JobId == jobModel.Id)
@@ -58,10 +58,12 @@ namespace InterviewPass.WebApi.Processors
 				throw new NotFoundException($"The following skills are missing in the database: {string.Join(", ", missingSkills)}. Please add them to the Skills table.");
 
 
-			job.JobSkills = skills.Select(skill => new JobSkill
+            var jobId = _unitOfWork.JobRepo.Add(job).Id;
+
+            job.JobSkills = skills.Select(skill => new JobSkill
 			{
 				Id = Guid.NewGuid().ToString(),
-				JobId = job.Id,
+				JobId = jobId,
 				SkillId = skill.Id,
 			}).ToList();
 
@@ -76,19 +78,18 @@ namespace InterviewPass.WebApi.Processors
 			job.JobBenefits = benefits.Select(b => new JobBenefit
 			{
 				Id = Guid.NewGuid().ToString(),
-				JobId = job.Id,
+				JobId = jobId,
 				BenefitId = b.Id
 			}).ToList();
 
 			job.JobFiles = jobModel.Files.Select(b64 => new JobFile
 			{
 				Id = Guid.NewGuid().ToString(),
-				JobId = job.Id,
+				JobId = jobId,
 				File = Convert.FromBase64String(b64),
 				FileName = $"job_{job.Id}_{DateTime.UtcNow:yyyyMMdd_HHmmss}"
 			}).ToList();
 
-			_unitOfWork.JobRepo.Add(job);
 			_unitOfWork.Save();
 
 			return _mapper.Map<JobModel>(job);
