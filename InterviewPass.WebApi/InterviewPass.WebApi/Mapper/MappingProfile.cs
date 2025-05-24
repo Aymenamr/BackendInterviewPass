@@ -40,6 +40,7 @@ namespace InterviewPass.WebApi.Mapper
             CreateMap<PracticalQuestion, PracticalQuestionModel>().ReverseMap();
             CreateMap<ObjectiveQuestion, ObjectiveQuestionModel>().ReverseMap();
             CreateMap<Possibility, PossibilityModel>().ReverseMap();
+            CreateMap<Result, ResultModel>().ReverseMap();
         }
     }
 }
