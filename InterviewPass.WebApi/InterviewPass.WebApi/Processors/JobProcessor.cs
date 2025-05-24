@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using Infrastructure.Exceptions;
 using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.UnitOfWork;
+using InterviewPass.Infrastructure.Exceptions;
 using InterviewPass.WebApi.Models;
 
 namespace InterviewPass.WebApi.Processors
@@ -17,7 +17,7 @@ namespace InterviewPass.WebApi.Processors
 			_mapper = mapper;
 		}
 
-		public JobModel getJobWithDetails(JobModel jobModel)
+		public JobModel GJob(JobModel jobModel)
 		{
 			var skillIds = _unitOfWork.JobSkillRepo.GetAll()
 				.Where(js => js.JobId == jobModel.Id)
