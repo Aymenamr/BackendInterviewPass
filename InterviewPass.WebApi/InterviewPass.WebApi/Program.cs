@@ -3,6 +3,7 @@ using InterviewPass.DataAccess.Repositories;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.DataAccess.Services;
 using InterviewPass.DataAccess.UnitOfWork;
+using InterviewPass.Infrastructure.Middlewares;
 using InterviewPass.WebApi.Enums;
 using InterviewPass.WebApi.Examples;
 using InterviewPass.WebApi.Mapper;

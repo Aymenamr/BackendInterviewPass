@@ -2,6 +2,7 @@
 
 namespace InterviewPass.WebApi.Models
 {
+	//TODO remove this class
 	public class EmploymentTypeModel
 	{
 		public string Id { get; set; }

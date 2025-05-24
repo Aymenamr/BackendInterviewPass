@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InterviewPass.WebApi", "Int
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InterviewPass.DataAccess", "InterviewPass.DataAccess\InterviewPass.DataAccess.csproj", "{6000317B-5D24-4505-99FA-85214B9C727D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{8949C8BC-79E1-4FC9-9F72-9D6F032B2DD0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterviewPass.Infrastructure", "Infrastructure\InterviewPass.Infrastructure.csproj", "{8949C8BC-79E1-4FC9-9F72-9D6F032B2DD0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

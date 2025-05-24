@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.Exceptions
+namespace InterviewPass.Infrastructure.Exceptions
 {
 	public class NotFoundException : Exception
 	{
