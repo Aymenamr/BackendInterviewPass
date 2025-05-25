@@ -1,4 +1,5 @@
 ﻿using InterviewPass.DataAccess.Entities;
+using InterviewPass.WebApi.Models.User;
 
 namespace InterviewPass.WebApi.Models
 {
@@ -15,6 +16,6 @@ namespace InterviewPass.WebApi.Models
         public string? GitHubLink { get; set; }
         public string? ResultId { get; set; }
         public virtual ICollection<PossibilityModel> SelectedPossibilities { get; set; } = new List<PossibilityModel>();
-        public virtual UserJobSeeker? User { get; set; }
+        public virtual UserJobSeekerModel? User { get; set; }
     }
 }
