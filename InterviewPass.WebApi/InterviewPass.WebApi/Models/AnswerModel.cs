@@ -15,7 +15,6 @@ namespace InterviewPass.WebApi.Models
         public string? ZipAnswer { get; set; }
         public string? GitHubLink { get; set; }
         public string? ResultId { get; set; }
-        public virtual ICollection<PossibilityModel> SelectedPossibilities { get; set; } = new List<PossibilityModel>();
-        public virtual UserJobSeekerModel? User { get; set; }
+        public List<PossibilityModel> SelectedPossibilities { get; set; } = new List<PossibilityModel>();
     }
 }
