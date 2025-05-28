@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using AutoMapper;  // لتحويل البيانات بين الكائنات
 using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.WebApi.Models;
@@ -16,7 +16,7 @@ namespace InterviewPass.WebApi.Controllers
     {
         private readonly ILogger<ExamController> _logger;
         private readonly IGenericRepository<Exam> _examRepository;
-        private readonly IMapper _mapper;
+        private readonly IMapper _mapper; //لتحويل البيانات من Exam إلى ExamModel والعكس
         private readonly IExamProcessor _examProcessor;
 
         public ExamController(ILogger<ExamController> logger, IGenericRepository<Exam> examRepository, IMapper mapper,IExamProcessor examProcessor)
