@@ -63,7 +63,7 @@ namespace InterviewPass.WebApi.Controllers
         /// Create a new question
         /// </summary>
         [HttpPost]
-        [SwaggerRequestExample(typeof(QuestionModel), typeof(QuestionExampleDocumentation))] 
+        [SwaggerRequestExample(typeof(QuestionModel), typeof(QuestionExampleDocumentation))]
         [ProducesResponseType(typeof(QuestionModel), StatusCodes.Status201Created)]
         public IActionResult Create([FromBody] QuestionModel model)
         {
