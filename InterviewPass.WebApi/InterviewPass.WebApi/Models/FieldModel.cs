@@ -2,7 +2,7 @@
 
 namespace InterviewPass.WebApi.Models
 {
-    public class FieldModel
+    public class ResultModel
     {        
         public string? Id { get; set; }
 

@@ -1,3 +1,4 @@
+using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -67,6 +68,21 @@ namespace InterviewPass.DataAccess.Repositories
             {
                 idProperty.SetValue(entity, Guid.NewGuid().ToString());
             }
+        }
+
+        public Task<Result> GetByIdAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SaveAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Add(Field fieldEntity)
+        {
+            throw new NotImplementedException();
         }
     }
 }

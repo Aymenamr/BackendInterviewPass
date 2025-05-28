@@ -33,7 +33,7 @@ namespace InterviewPass.WebApi.Mapper
                             src.QuestionExams.Select(qe =>
                                 qe.IdQuestionNavigation.GetQuestionModel())))
                 .ForMember(dest => dest.Author, opt => opt.MapFrom(src => src.CreatedBy));
-            CreateMap<Field, FieldModel>().ReverseMap();
+            CreateMap<Field, ResultModel>().ReverseMap();
             CreateMap<Skill, SkillModel>().ReverseMap();
             CreateMap<MultipleChoiceQuestion, MultipleChoiceQuestionModel>().ReverseMap();
             CreateMap<TrueFalseQuestion, TrueFalseQuestionModel>().ReverseMap();

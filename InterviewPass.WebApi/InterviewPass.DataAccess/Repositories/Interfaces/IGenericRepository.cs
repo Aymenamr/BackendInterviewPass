@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InterviewPass.DataAccess.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -15,6 +16,8 @@ namespace InterviewPass.DataAccess.Repositories.Interfaces
         void Commit();
         T GetByProperty(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes);
         List<T> GetAll();
-
+        Task<Result> GetByIdAsync(int id);
+        Task SaveAsync();
+        void Add(Field fieldEntity);
     }
 }
