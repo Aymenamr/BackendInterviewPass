@@ -19,7 +19,7 @@ namespace InterviewPass.WebApi.Models.Question
         [Required]
         [RegularExpression(@"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", ErrorMessage = "Skill ID must be GUID.")]
         public string? SkillId { get; set; }
-        public string QuestionType { get; set; } // هذه مهمة جداً وهي التي تميز النوع
+        public string QuestionType { get; set; } 
 
     }
 }

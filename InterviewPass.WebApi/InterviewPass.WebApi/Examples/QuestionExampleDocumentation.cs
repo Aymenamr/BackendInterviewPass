@@ -16,7 +16,7 @@ namespace InterviewPass.WebApi.Examples
                     Content = "What is polymorphism in object-oriented programming?",
                     SkillId = "1452",
                     Score = 5,
-                    Id = "b1234567-89ab-4def-90cd-1234567890ab" // UUID وهمي - استبدليه بواحد حقيقي إن لزم
+                    Id = "b1234567-89ab-4def-90cd-1234567890ab" 
                 });
         }
     }
