@@ -2,20 +2,22 @@ using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.DataAccess.Services;
-using Microsoft.EntityFrameworkCore;
-using System.Reflection;
-using JsonSubTypes;
-using InterviewPass.WebApi.Models.User;
-using InterviewPass.WebApi.Mapper;
-using InterviewPass.WebApi.Enums;
-using Swashbuckle.AspNetCore.Filters;
-using InterviewPass.WebApi.Examples;
-using Microsoft.Extensions.DependencyInjection;
-using Serilog;
-using InterviewPass.WebApi.Models.Question;
 using InterviewPass.DataAccess.UnitOfWork;
+using InterviewPass.WebApi.Enums;
+using InterviewPass.WebApi.Examples;
+using InterviewPass.WebApi.Mapper;
+using InterviewPass.WebApi.Models.Question;
+using InterviewPass.WebApi.Models.User;
 using InterviewPass.WebApi.Processors;
-using Microsoft.AspNetCore.Diagnostics;
+using JsonSubTypes;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using Swashbuckle.AspNetCore.Filters;
+using System.Reflection;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,35 +25,54 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
-    //and define the device Discriminator
-    options.SerializerSettings.Converters.Add(
-        JsonSubtypesConverterBuilder
-        .Of(typeof(UserModel), "UserType")
-        .RegisterSubtype(typeof(UserJobSeekerModel), UserType.JobSeeker)
-        .RegisterSubtype(typeof(UserHrModel), UserType.Hr)
-        .SerializeDiscriminatorProperty()
-        .Build());
+	//and define the device Discriminator
+	options.SerializerSettings.Converters.Add(
+		JsonSubtypesConverterBuilder
+		.Of(typeof(UserModel), "UserType")
+		.RegisterSubtype(typeof(UserJobSeekerModel), UserType.JobSeeker)
+		.RegisterSubtype(typeof(UserHrModel), UserType.Hr)
+		.SerializeDiscriminatorProperty()
+		.Build());
 }).AddNewtonsoftJson(options =>
-        {
-            options.SerializerSettings.Converters.Add(
-                JsonSubtypesConverterBuilder
-                    .Of(typeof(QuestionModel), "QuestionType")
-                    .RegisterSubtype(typeof(MultipleChoiceQuestionModel), "MultipleChoice")
-                    .RegisterSubtype(typeof(TrueFalseQuestionModel), "TrueFalse")
-                    .RegisterSubtype(typeof(PracticalQuestionModel), "Practical")
-                    .RegisterSubtype(typeof(ObjectiveQuestionModel), "Objective")
-                    .SerializeDiscriminatorProperty()
-                    .Build());
-        });
+		{
+			options.SerializerSettings.Converters.Add(
+				JsonSubtypesConverterBuilder
+					.Of(typeof(QuestionModel), "QuestionType")
+					.RegisterSubtype(typeof(MultipleChoiceQuestionModel), "MultipleChoice")
+					.RegisterSubtype(typeof(TrueFalseQuestionModel), "TrueFalse")
+					.RegisterSubtype(typeof(PracticalQuestionModel), "Practical")
+					.RegisterSubtype(typeof(ObjectiveQuestionModel), "Objective")
+					.SerializeDiscriminatorProperty()
+					.Build());
+		});
+
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+	.AddJwtBearer(options =>
+	{
+		options.TokenValidationParameters = new TokenValidationParameters()
+		{
+			ValidateIssuer = true,
+			ValidateAudience = true,
+			ValidateLifetime = true,
+			ValidateIssuerSigningKey = true,
+			ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+			ValidAudience = builder.Configuration["JwtSettings:Audience"],
+			IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JwtSettings:SecretKey"])),
+			ClockSkew = TimeSpan.Zero
+		};
+	});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    // Automatically include XML comments from the assembly
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
-    // Enable support for examples
-    options.ExampleFilters();
+	// Automatically include XML comments from the assembly
+	options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
+	// Enable support for examples
+	options.ExampleFilters();
 });
 builder.Services.AddSwaggerExamplesFromAssemblyOf<UserExampleDocumentation>();
 builder.Services.AddSwaggerExamplesFromAssemblyOf<ExamExampleDocumentation>();
@@ -62,9 +83,9 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Host.UseSerilog((context, loggerConfiguration) =>
 {
 
-    loggerConfiguration
-    .ReadFrom.Configuration(context.Configuration) // Read settings from appsettings.json
-    .Enrich.FromLogContext();
+	loggerConfiguration
+	.ReadFrom.Configuration(context.Configuration) // Read settings from appsettings.json
+	.Enrich.FromLogContext();
 });
 
 //Dependency injection
@@ -76,12 +97,12 @@ builder.Services.AddTransient<JobSeekerRepository>();
 builder.Services.AddTransient<HrRepository>();
 builder.Services.AddTransient<Func<string, IUserRepository>>(serviceProvider => key =>
 {
-    return key switch
-    {
-        "JobSeeker" => serviceProvider.GetRequiredService<JobSeekerRepository>(),
-        "Hr" => serviceProvider.GetRequiredService<HrRepository>(),
-        _ => throw new KeyNotFoundException("Service not found.")
-    };
+	return key switch
+	{
+		"JobSeeker" => serviceProvider.GetRequiredService<JobSeekerRepository>(),
+		"Hr" => serviceProvider.GetRequiredService<HrRepository>(),
+		_ => throw new KeyNotFoundException("Service not found.")
+	};
 });
 
 var app = builder.Build();
@@ -89,14 +110,14 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+	app.UseSwagger();
+	app.UseSwaggerUI();
 }
 
 app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<ExceptionHandler>();
 app.MapControllers();
