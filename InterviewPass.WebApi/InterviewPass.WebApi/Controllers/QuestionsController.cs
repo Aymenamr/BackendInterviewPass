@@ -2,6 +2,7 @@
 using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.UnitOfWork;
 using InterviewPass.WebApi.Examples;
+using InterviewPass.WebApi.Extensions;
 using InterviewPass.WebApi.Models.Question;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -34,8 +35,8 @@ namespace InterviewPass.WebApi.Controllers
         {
             try
             {
-                var questions = _unitOfWork.QuestionRepo.GetAll();
-                var result = _mapper.Map<List<QuestionModel>>(questions);
+                var questionEntity = _unitOfWork.QuestionRepo.GetAll();
+                var result = _mapper.Map<List<QuestionModel>>(questionEntity);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -51,11 +52,11 @@ namespace InterviewPass.WebApi.Controllers
         [HttpGet("{id}")]
         public IActionResult GetById(string id)
         {
-            var question = _unitOfWork.QuestionRepo.GetByProperty(q => q.Id == id);
-            if (question == null)
+            var questionEntity = _unitOfWork.QuestionRepo.GetByProperty(q => q.Id == id);
+            if (questionEntity == null)
                 return NotFound("Question not found");
 
-            var result = _mapper.Map<QuestionModel>(question);
+            var result = _mapper.Map<QuestionModel>(questionEntity);
             return Ok(result);
         }
 
@@ -70,12 +71,12 @@ namespace InterviewPass.WebApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var entity = _mapper.Map<Question>(model);
-            _unitOfWork.QuestionRepo.Add(entity);
+            var questionEntity = model.GetQuestionEntiy(_mapper);
+            _unitOfWork.QuestionRepo.Add(questionEntity);
             _unitOfWork.Save();
 
-            var createdModel = _mapper.Map<QuestionModel>(entity);
-            return CreatedAtAction(nameof(GetById), new { id = entity.Id }, createdModel);
+            var createdModel = _mapper.Map<QuestionModel>(questionEntity);
+            return CreatedAtAction(nameof(GetById), new { id = questionEntity.Id }, createdModel);
         }
 
         /// <summary>
