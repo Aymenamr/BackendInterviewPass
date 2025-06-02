@@ -3,6 +3,7 @@ using InterviewPass.DataAccess.Repositories;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.DataAccess.Services;
 using InterviewPass.DataAccess.UnitOfWork;
+using InterviewPass.Infrastructure.Middlewares;
 using InterviewPass.WebApi.Enums;
 using InterviewPass.WebApi.Examples;
 using InterviewPass.WebApi.Mapper;
@@ -18,6 +19,10 @@ using Serilog;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Swashbuckle.AspNetCore.Filters;
+using System.Reflection;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -76,6 +81,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 builder.Services.AddSwaggerExamplesFromAssemblyOf<UserExampleDocumentation>();
 builder.Services.AddSwaggerExamplesFromAssemblyOf<ExamExampleDocumentation>();
+builder.Services.AddSwaggerExamplesFromAssemblyOf<JobExampleDocumentation>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
@@ -93,8 +99,10 @@ builder.Services.AddTransient<DbContext, InterviewPassContext>();
 builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IExamProcessor, ExamProcessor>();
+builder.Services.AddTransient<IJobProcessor, JobProcessor>();
 builder.Services.AddTransient<JobSeekerRepository>();
 builder.Services.AddTransient<HrRepository>();
+//builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddTransient<Func<string, IUserRepository>>(serviceProvider => key =>
 {
 	return key switch
@@ -104,6 +112,14 @@ builder.Services.AddTransient<Func<string, IUserRepository>>(serviceProvider => 
 		_ => throw new KeyNotFoundException("Service not found.")
 	};
 });
+builder.Services
+    .AddCors(options =>
+    {
+        options.AddPolicy("AllowOrigin",
+            builder => builder.WithOrigins("http://localhost:4200")
+                              .AllowAnyHeader()
+                              .AllowAnyMethod());
+    });  
 
 var app = builder.Build();
 

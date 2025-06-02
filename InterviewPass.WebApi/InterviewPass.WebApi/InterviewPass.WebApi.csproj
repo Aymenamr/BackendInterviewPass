@@ -26,11 +26,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Infrastructure\InterviewPass.Infrastructure.csproj" />
     <ProjectReference Include="..\InterviewPass.DataAccess\InterviewPass.DataAccess.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Middlewares\" />
   </ItemGroup>
 
 </Project>

@@ -24,12 +24,12 @@ namespace InterviewPass.WebApi.Examples
                     MinScore = 40,
                     MaxScore = 80,
                     DeadLineInNbrOfDays = 20,
-                    NbrOfQuestion = 15,
+                    NbrOfQuestion = 2,
                     Questions = new List<QuestionModel> {
                         new MultipleChoiceQuestionModel {
                             Id = null,
-                            Score=10,
-                            Content = "which is a C# framework",
+                            Score=2,
+                            Content = "which framework uses c# language",
                             HasSignleChoice=true,
                             SkillId= Guid.NewGuid().ToString(),
                             Possibilities = new List<PossibilityModel> {
@@ -45,27 +45,13 @@ namespace InterviewPass.WebApi.Examples
                                             } } },
                         new TrueFalseQuestionModel{
                             Id = null,
-                            Content="questions content",
+                            Content="Is .Net Core a cross platfrom ?",
                             IsTrue=false,
                             SkillId= Guid.NewGuid().ToString(),
                             Score=5
 
-                            },
-                        new PracticalQuestionModel
-                        {
-                            Id = null,
-                            SkillId= Guid.NewGuid().ToString(),
-                            Content="Practical Question content",
-                            Score=20
-                        },
-                        new ObjectiveQuestionModel
-                        {
-                            Id = null,
-                            SkillId= Guid.NewGuid().ToString(),
-                            Content="Objective Question content",
-                            Score=20
-                        } }
-
+                            }
+                    }
                 });
         }
     }
