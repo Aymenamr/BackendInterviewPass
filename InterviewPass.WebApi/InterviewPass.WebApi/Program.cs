@@ -11,6 +11,14 @@ using InterviewPass.WebApi.Models.Question;
 using InterviewPass.WebApi.Models.User;
 using InterviewPass.WebApi.Processors;
 using JsonSubTypes;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using Swashbuckle.AspNetCore.Filters;
+using System.Reflection;
+using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Swashbuckle.AspNetCore.Filters;
@@ -43,6 +51,25 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 					.Build());
 		});
 
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+	.AddJwtBearer(options =>
+	{
+		options.TokenValidationParameters = new TokenValidationParameters()
+		{
+			ValidateIssuer = true,
+			ValidateAudience = true,
+			ValidateLifetime = true,
+			ValidateIssuerSigningKey = true,
+			ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+			ValidAudience = builder.Configuration["JwtSettings:Audience"],
+			IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JwtSettings:SecretKey"])),
+			ClockSkew = TimeSpan.Zero
+		};
+	});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -55,7 +82,6 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddSwaggerExamplesFromAssemblyOf<UserExampleDocumentation>();
 builder.Services.AddSwaggerExamplesFromAssemblyOf<ExamExampleDocumentation>();
 builder.Services.AddSwaggerExamplesFromAssemblyOf<JobExampleDocumentation>();
-
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
@@ -95,8 +121,8 @@ builder.Services
                               .AllowAnyMethod());
     });  
 
-var app = builder.Build(); 
-app.UseCors("AllowOrigin");
+var app = builder.Build();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -107,7 +133,7 @@ if (app.Environment.IsDevelopment())
 app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<ExceptionHandler>();
 app.MapControllers();
