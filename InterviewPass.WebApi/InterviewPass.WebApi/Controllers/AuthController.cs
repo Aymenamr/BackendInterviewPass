@@ -40,17 +40,18 @@ namespace InterviewPass.WebApi.Controllers
 			{
 				return Unauthorized("Invalid email or password");
 			}
+			// Decode Base64 to get the original hash from database
+			string originalHashFromDB;
 
-			//exception here
+			byte[] hashBytes = Convert.FromBase64String(user.PasswordHash);
+			originalHashFromDB = Encoding.UTF8.GetString(hashBytes);
 
-			//var passwordHasher = new PasswordHasher<User>();
-			//var result = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginModel.Password);
-
-			//if (result == PasswordVerificationResult.Failed)
-			//{
-			//	return Unauthorized("Invalid email or password");
-			//}
-
+			// Frontend sends hashed password, compare hashes directly
+			// loginModel.Password is already hashed by frontend 
+			if (originalHashFromDB != loginModel.Password)
+			{
+				return Unauthorized("Invalid password");
+			}
 			var token = GenerateJwtToken(user);
 
 			return Ok(new
