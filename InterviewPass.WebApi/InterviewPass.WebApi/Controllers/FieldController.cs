@@ -34,7 +34,7 @@ namespace InterviewPass.WebApi.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_mapper.Map<List<ResultModel>>(_fieldRepository.GetAll()));
+            return Ok(_mapper.Map<List<FieldModel>>(_fieldRepository.GetAll()));
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace InterviewPass.WebApi.Controllers
             if (field == null)
                 return NotFound("Field not found");
             
-            return Ok(_mapper.Map<ResultModel>(field));
+            return Ok(_mapper.Map<FieldModel>(field));
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace InterviewPass.WebApi.Controllers
         /// <response code="500">If there is an error retrieving the data.</response>
         // POST api/<FieldController>
         [HttpPost]
-        public IActionResult Post([FromBody] ResultModel fieldmodel)
+        public IActionResult Post([FromBody] FieldModel fieldmodel)
         {
             var fieldEntity = _mapper.Map<Field>(fieldmodel);
             if (_fieldRepository.GetByProperty(field => field.Name == fieldmodel.Name) != null)

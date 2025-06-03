@@ -3,6 +3,9 @@ using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
+using InterviewPass.WebApi.Examples;
+using Swashbuckle.AspNetCore.Filters;
+using InterviewPass.WebApi.Processors;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -24,7 +27,15 @@ namespace InterviewPass.WebApi.Controllers
             _mapper = mapper;
         }
 
-        // POST api/<ValuesController>
+        /// <summary>
+        /// Add a new result to the database
+        /// </summary>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        /// <response code="201">The result was successfully created.</response>
+        /// <response code="409">The result data conflict with other result data.</response>
+        /// <response code="500">If there is an error retrieving the data.</response>
+        // POST api/<ResultController>
         [HttpPost]
         public IActionResult Create([FromBody] ResultModel resultmodel)
         {
@@ -35,18 +46,32 @@ namespace InterviewPass.WebApi.Controllers
             }
             _resultRepository.Add(Result);
             _resultRepository.Commit();
-            resultmodel.Id = Result.Id;
+            resultmodel.UserId = Result.Id;
             return CreatedAtAction(nameof(GetAll), new { UserId = Result.Id }, resultmodel);
         }
 
-        // GET api/<ValuesController>
+        /// <summary>
+        /// Retrieves the list of all results
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="200">Returns the list of results successfully.</response>
+        /// <response code="500">Internal Server Error.</response>
+        // GET api/<ResultController>
         [HttpGet("{id}")]
         public IActionResult GetAll(int UserId)
         {
             return Ok(_mapper.Map<List<ResultModel>>(_resultRepository.GetAll()));
         }
 
-        // PUT api/<ValuesController>/5
+        /// <summary>
+        /// Retrieve a result according to his name
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        /// <response code="200">Result found and returned successfully.</response>
+        /// <response code="404">Result not found.</response>
+        /// <response code="500">Internal Server Error.</response>
+        // PUT api/<ResultController>/5
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody] string value)
         {
@@ -61,14 +86,23 @@ namespace InterviewPass.WebApi.Controllers
             return Ok(new { message = "Result updated successfully" });
         }
 
-        // DELETE api/<ValuesController>/5
+        /// <summary>
+        /// Delete a result according to his id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <response code="200">The result was successfully deleted.</response>
+        /// <response code="404">Result not found.</response>
+        /// <response code="400">Result is used in some skills.</response>
+        /// <response code="500">If there is an error retrieving the data.</response>
+        // DELETE api/<ResultController>/5
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
             var result = _resultRepository.GetByProperty(r => r.Id == id);
             if (result == null)
             {
-                return NotFound("result not found");
+                return NotFound("Result not found");
 
             }
             _resultRepository.Delete(result);
