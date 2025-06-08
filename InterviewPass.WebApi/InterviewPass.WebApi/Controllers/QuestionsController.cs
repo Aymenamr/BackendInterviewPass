@@ -75,7 +75,7 @@ namespace InterviewPass.WebApi.Controllers
             _unitOfWork.QuestionRepo.Add(questionEntity);
             _unitOfWork.Save();
 
-            var createdModel = _mapper.Map<QuestionModel>(questionEntity);
+            var createdModel = questionEntity.GetQuestionModel(_mapper);
             return CreatedAtAction(nameof(GetById), new { id = questionEntity.Id }, createdModel);
         }
 
