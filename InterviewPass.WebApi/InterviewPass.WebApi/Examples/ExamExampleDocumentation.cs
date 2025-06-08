@@ -24,12 +24,12 @@ namespace InterviewPass.WebApi.Examples
                     MinScore = 40,
                     MaxScore = 80,
                     DeadLineInNbrOfDays = 20,
-                    NbrOfQuestion = 15,
+                    NbrOfQuestion = 2,
                     Questions = new List<QuestionModel> {
                         new MultipleChoiceQuestionModel {
                             Id = null,
                             Score=2,
-                            Content = "which is a C# framework",
+                            Content = "which framework uses c# language",
                             HasSignleChoice=true,
                             SkillId= Guid.NewGuid().ToString(),
                             Possibilities = new List<PossibilityModel> {
@@ -45,7 +45,7 @@ namespace InterviewPass.WebApi.Examples
                                             } } },
                         new TrueFalseQuestionModel{
                             Id = null,
-                            Content="questions content",
+                            Content="Is .Net Core a cross platfrom ?",
                             IsTrue=false,
                             SkillId= Guid.NewGuid().ToString(),
                             Score=5
