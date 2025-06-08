@@ -1,6 +1,7 @@
 ﻿using InterviewPass.DataAccess.Entities.Questions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace InterviewPass.DataAccess.Entities;
 
@@ -52,9 +53,14 @@ public partial class InterviewPassContext : DbContext
 
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-		=> optionsBuilder.UseSqlite(string.Format("DataSource={0}", DbPath));
+	{ 
+		 optionsBuilder.UseSqlite(string.Format("DataSource={0}", DbPath));
+		// تفعيل المفاتيح الأجنبية
+		optionsBuilder.LogTo(Console.WriteLine); // اختيارية، لمراقبة الاستعلامات
 
-	protected override void OnModelCreating(ModelBuilder modelBuilder)
+		base.OnConfiguring(optionsBuilder);
+	}
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		modelBuilder.Entity<Answer>(entity =>
 		{
