@@ -74,6 +74,8 @@ builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IExamProcessor, ExamProcessor>();
 builder.Services.AddTransient<JobSeekerRepository>();
 builder.Services.AddTransient<HrRepository>();
+builder.Services.AddTransient<IAnswerScoringService, AnswerScoringService>();
+
 builder.Services.AddTransient<Func<string, IUserRepository>>(serviceProvider => key =>
 {
     return key switch
@@ -84,6 +86,7 @@ builder.Services.AddTransient<Func<string, IUserRepository>>(serviceProvider => 
     };
 });
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -91,6 +94,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
+
 }
 
 app.UseSerilogRequestLogging();

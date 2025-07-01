@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿
+using AutoMapper;
 using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Entities.Questions;
 using InterviewPass.DataAccess.UnitOfWork;
@@ -14,17 +15,17 @@ namespace InterviewPass.WebApi.Processors
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public ExamProcessor(IUnitOfWork unitOfWork,IMapper mapper)
-        { 
+        public ExamProcessor(IUnitOfWork unitOfWork, IMapper mapper)
+        {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
         public ExamModel ProcessExam(ExamModel exam)
-        {          
+        {
 
             Exam examEntity = _mapper.Map<Exam>(exam);
-            List<string> idQuestions = new List<string> ();
-            
+            List<string> idQuestions = new List<string>();
+
             //Add the Questions with their possibilities
             foreach (var question in exam.Questions)
             {
@@ -45,9 +46,9 @@ namespace InterviewPass.WebApi.Processors
                            IdExam = idExam
                        });
             }
-            exam.Id  = idExam;
+            exam.Id = idExam;
             _unitOfWork.Save();
-            return exam;    
+            return exam;
         }
     }
 }

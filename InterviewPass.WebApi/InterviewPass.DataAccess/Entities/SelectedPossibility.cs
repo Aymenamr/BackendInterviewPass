@@ -14,4 +14,5 @@ public partial class SelectedPossibility
     public virtual Answer? IdAnswerNavigation { get; set; }
 
     public virtual Possibility? IdPossibilityNavigation { get; set; }
+    public string PossibilityId { get; set; }
 }

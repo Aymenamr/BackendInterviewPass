@@ -11,6 +11,7 @@ public partial class QuestionExam
 
     public int Id { get; set; }
 
+    
     public virtual Exam IdExamNavigation { get; set; } = null!;
 
     public virtual Question IdQuestionNavigation { get; set; } = null!;

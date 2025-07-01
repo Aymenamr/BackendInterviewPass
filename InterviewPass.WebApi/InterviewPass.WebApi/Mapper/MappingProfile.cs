@@ -43,6 +43,18 @@ namespace InterviewPass.WebApi.Mapper
             CreateMap<TrueFalseQuestion, TrueFalseQuestionModel>().ReverseMap();
             CreateMap<PracticalQuestion, PracticalQuestionModel>().ReverseMap();
             CreateMap<ObjectiveQuestion, ObjectiveQuestionModel>().ReverseMap();
+
+            CreateMap<AnswerModel, Answer>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore()) 
+                .ForMember(dest => dest.ObtainedScore, opt => opt.MapFrom(src => src.ManualScore))
+                .ForMember(dest => dest.SelectedPossibilities, opt => opt.Ignore());
+
+            CreateMap<Answer, AnswerModel>()
+                .ForMember(dest => dest.ManualScore, opt => opt.MapFrom(src => src.ObtainedScore))
+                .ForMember(dest => dest.SelectedChoiceIds, opt => opt.MapFrom(src =>
+                    src.SelectedPossibilities.Select(sp => sp.IdPossibility).ToList()));
+
+
         }
     }
 }

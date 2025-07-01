@@ -18,6 +18,11 @@ namespace InterviewPass.DataAccess.Repositories
             _dbContext = dbContext;
             _dbSet = _dbContext.Set<T>();
         }
+        public async Task<T?> GetByIdAsync(string id)
+        {
+            return await _dbContext.Set<T>().FindAsync(id);
+        }
+
 
         public T Add(T entity)
         {

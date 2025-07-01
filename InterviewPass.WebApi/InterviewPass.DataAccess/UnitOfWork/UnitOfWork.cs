@@ -9,7 +9,9 @@ namespace InterviewPass.DataAccess.UnitOfWork
 	{
 		public IGenericRepository<Exam> ExamRepo { get; }
 		public IGenericRepository<Question> QuestionRepo { get; }
-		public IGenericRepository<Possibility> PossibilityRepo { get; }
+        public IGenericRepository<Answer> AnswerRepo { get; }
+
+        public IGenericRepository<Possibility> PossibilityRepo { get; }
 		public IGenericRepository<Job> JobRepo { get; }
 
 		private readonly DbContext _dbContext;
@@ -21,12 +23,25 @@ namespace InterviewPass.DataAccess.UnitOfWork
 			QuestionRepo = new GenericRepository<Question>(_dbContext);
 			PossibilityRepo = new GenericRepository<Possibility>(_dbContext);
 			JobRepo = new GenericRepository<Job>(_dbContext);
-		}
+            AnswerRepo = new GenericRepository<Answer>(_dbContext);
 
-		public void Save()
+        }
+
+        public void Save()
 		{
-			_dbContext.SaveChanges();
-		}
+            try
+            {
+                 _dbContext.SaveChanges();
+               
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine("DB Error: " + ex.InnerException?.Message);
+                throw; // لإعادة رمي الخطأ بعد الطباعة
+            }
+
+
+        }
 
 	}
 }

@@ -68,6 +68,32 @@ namespace InterviewPass.DataAccess.Migrations
                     b.ToTable("Answer", (string)null);
                 });
 
+            modelBuilder.Entity("InterviewPass.DataAccess.Entities.Benefits", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("STRING");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("STRING");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Benefits", (string)null);
+                });
+
+            modelBuilder.Entity("InterviewPass.DataAccess.Entities.EmploymentType", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("STRING");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("STRING");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EmploymentType", (string)null);
+                });
+
             modelBuilder.Entity("InterviewPass.DataAccess.Entities.Exam", b =>
                 {
                     b.Property<string>("Id")
@@ -123,6 +149,107 @@ namespace InterviewPass.DataAccess.Migrations
                         .IsUnique();
 
                     b.ToTable("Field", (string)null);
+                });
+
+            modelBuilder.Entity("InterviewPass.DataAccess.Entities.Job", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("STRING");
+
+                    b.Property<string>("EmploymentTypeId")
+                        .HasColumnType("STRING");
+
+                    b.Property<int?>("Experience")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ImagePath")
+                        .HasColumnType("STRING");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("STRING");
+
+                    b.Property<double?>("Salary")
+                        .HasColumnType("DOUBLE");
+
+                    b.Property<string>("ShortDescription")
+                        .HasColumnType("STRING");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("STRING");
+
+                    b.Property<string>("WorkingSchedule")
+                        .HasColumnType("STRING");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmploymentTypeId");
+
+                    b.HasIndex(new[] { "Title" }, "IX_Job_Title");
+
+                    b.ToTable("Job", (string)null);
+                });
+
+            modelBuilder.Entity("InterviewPass.DataAccess.Entities.JobBenefit", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("STRING");
+
+                    b.Property<string>("BenefitsId")
+                        .IsRequired()
+                        .HasColumnType("STRING");
+
+                    b.Property<string>("JobId")
+                        .IsRequired()
+                        .HasColumnType("STRING");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BenefitsId");
+
+                    b.HasIndex("JobId");
+
+                    b.ToTable("JobBenefit", (string)null);
+                });
+
+            modelBuilder.Entity("InterviewPass.DataAccess.Entities.JobFile", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("STRING");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("STRING");
+
+                    b.Property<string>("FilePath")
+                        .HasColumnType("STRING");
+
+                    b.Property<string>("JobId")
+                        .HasColumnType("STRING");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobId");
+
+                    b.ToTable("JobFile", (string)null);
+                });
+
+            modelBuilder.Entity("InterviewPass.DataAccess.Entities.JobSkill", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("STRING");
+
+                    b.Property<string>("JobId")
+                        .HasColumnType("STRING");
+
+                    b.Property<string>("SkillId")
+                        .HasColumnType("STRING");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobId");
+
+                    b.HasIndex("SkillId");
+
+                    b.ToTable("JobSkill", (string)null);
                 });
 
             modelBuilder.Entity("InterviewPass.DataAccess.Entities.Possibility", b =>
@@ -245,6 +372,10 @@ namespace InterviewPass.DataAccess.Migrations
 
                     b.Property<string>("IdPossibility")
                         .HasColumnType("STRING");
+
+                    b.Property<string>("PossibilityId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -438,6 +569,62 @@ namespace InterviewPass.DataAccess.Migrations
                     b.Navigation("CreatedByNavigation");
                 });
 
+            modelBuilder.Entity("InterviewPass.DataAccess.Entities.Job", b =>
+                {
+                    b.HasOne("InterviewPass.DataAccess.Entities.EmploymentType", "EmploymentType")
+                        .WithMany("Jobs")
+                        .HasForeignKey("EmploymentTypeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("EmploymentType");
+                });
+
+            modelBuilder.Entity("InterviewPass.DataAccess.Entities.JobBenefit", b =>
+                {
+                    b.HasOne("InterviewPass.DataAccess.Entities.Benefits", "Benefits")
+                        .WithMany("JobBenefits")
+                        .HasForeignKey("BenefitsId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("InterviewPass.DataAccess.Entities.Job", "Job")
+                        .WithMany("JobBenefits")
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Benefits");
+
+                    b.Navigation("Job");
+                });
+
+            modelBuilder.Entity("InterviewPass.DataAccess.Entities.JobFile", b =>
+                {
+                    b.HasOne("InterviewPass.DataAccess.Entities.Job", "Job")
+                        .WithMany("JobFiles")
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Job");
+                });
+
+            modelBuilder.Entity("InterviewPass.DataAccess.Entities.JobSkill", b =>
+                {
+                    b.HasOne("InterviewPass.DataAccess.Entities.Job", "Job")
+                        .WithMany("JobSkills")
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("InterviewPass.DataAccess.Entities.Skill", "Skill")
+                        .WithMany("JobSkills")
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Job");
+
+                    b.Navigation("Skill");
+                });
+
             modelBuilder.Entity("InterviewPass.DataAccess.Entities.Possibility", b =>
                 {
                     b.HasOne("InterviewPass.DataAccess.Entities.Question", "Question")
@@ -532,6 +719,16 @@ namespace InterviewPass.DataAccess.Migrations
                     b.Navigation("SelectedPossibilities");
                 });
 
+            modelBuilder.Entity("InterviewPass.DataAccess.Entities.Benefits", b =>
+                {
+                    b.Navigation("JobBenefits");
+                });
+
+            modelBuilder.Entity("InterviewPass.DataAccess.Entities.EmploymentType", b =>
+                {
+                    b.Navigation("Jobs");
+                });
+
             modelBuilder.Entity("InterviewPass.DataAccess.Entities.Exam", b =>
                 {
                     b.Navigation("Answers");
@@ -544,6 +741,15 @@ namespace InterviewPass.DataAccess.Migrations
             modelBuilder.Entity("InterviewPass.DataAccess.Entities.Field", b =>
                 {
                     b.Navigation("Skills");
+                });
+
+            modelBuilder.Entity("InterviewPass.DataAccess.Entities.Job", b =>
+                {
+                    b.Navigation("JobBenefits");
+
+                    b.Navigation("JobFiles");
+
+                    b.Navigation("JobSkills");
                 });
 
             modelBuilder.Entity("InterviewPass.DataAccess.Entities.Possibility", b =>
@@ -567,6 +773,8 @@ namespace InterviewPass.DataAccess.Migrations
 
             modelBuilder.Entity("InterviewPass.DataAccess.Entities.Skill", b =>
                 {
+                    b.Navigation("JobSkills");
+
                     b.Navigation("Questions");
 
                     b.Navigation("SkillBySeekers");

@@ -57,8 +57,7 @@ public partial class InterviewPassContext : DbContext
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{ 
 		 optionsBuilder.UseSqlite(string.Format("DataSource={0}", DbPath));
-		// تفعيل المفاتيح الأجنبية
-		optionsBuilder.LogTo(Console.WriteLine); // اختيارية، لمراقبة الاستعلامات
+		optionsBuilder.LogTo(Console.WriteLine); 
 
 		base.OnConfiguring(optionsBuilder);
 	}

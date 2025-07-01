@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿
+using AutoMapper;
 using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.UnitOfWork;
 using InterviewPass.WebApi.Examples;
@@ -75,7 +76,7 @@ namespace InterviewPass.WebApi.Controllers
             _unitOfWork.QuestionRepo.Add(questionEntity);
             _unitOfWork.Save();
 
-            var createdModel = _mapper.Map<QuestionModel>(questionEntity);
+            var createdModel = questionEntity.GetQuestionModel(_mapper);
             return CreatedAtAction(nameof(GetById), new { id = questionEntity.Id }, createdModel);
         }
 
