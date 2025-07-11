@@ -1,4 +1,4 @@
-using InterviewPass.DataAccess.Entities;
+﻿using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.DataAccess.Services;
@@ -23,16 +23,48 @@ using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
-var encryptedSecret = builder.Configuration["JwtSettings:SecretKey"];
-byte[] encryptedBytes = Convert.FromBase64String(encryptedSecret);
 
-byte[] decryptedBytes = ProtectedData.Unprotect(
-    encryptedBytes,
-    null,
-    DataProtectionScope.LocalMachine
-);
 
-string decryptedSecret = Encoding.UTF8.GetString(decryptedBytes);
+bool tagProtected = bool.Parse(builder.Configuration["JwtSettings:TagProtected"]);
+var entropy = Encoding.UTF8.GetBytes("MySuperSecretEntropyKey@2025!");
+
+string decryptedSecret;
+
+if (tagProtected == true)
+{
+
+    var encryptedBase64 = builder.Configuration["JwtSettings:SecretKey"];
+    byte[] encryptedBytes = Convert.FromBase64String(encryptedBase64);
+
+    byte[] decryptedBytes = ProtectedData.Unprotect(
+        encryptedBytes,
+        entropy,
+        DataProtectionScope.LocalMachine
+    );
+
+    decryptedSecret = Encoding.UTF8.GetString(decryptedBytes);
+}
+else
+{
+    decryptedSecret = builder.Configuration["JwtSettings:SecretKey"];
+
+    byte[] plainBytes = Encoding.UTF8.GetBytes(decryptedSecret);
+    byte[] encryptedBytes = ProtectedData.Protect(
+        plainBytes,
+        entropy,
+        DataProtectionScope.LocalMachine
+    );
+    string encryptedBase64 = Convert.ToBase64String(encryptedBytes);
+
+    var jsonFilePath = "appsettings.json";
+    var jsonText = File.ReadAllText(jsonFilePath);
+    dynamic jsonObj = Newtonsoft.Json.JsonConvert.DeserializeObject(jsonText);
+    jsonObj["JwtSettings"]["SecretKey"] = encryptedBase64;
+    jsonObj["JwtSettings"]["TagProtected"] = "true";
+    string updatedJson = Newtonsoft.Json.JsonConvert.SerializeObject(jsonObj, Newtonsoft.Json.Formatting.Indented);
+    File.WriteAllText(jsonFilePath, updatedJson);
+}
+
 
 // Add services to the container.
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
