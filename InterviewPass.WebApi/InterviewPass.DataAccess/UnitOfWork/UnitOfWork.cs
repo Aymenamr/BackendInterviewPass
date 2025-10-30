@@ -16,8 +16,10 @@ namespace InterviewPass.DataAccess.UnitOfWork
 		public IGenericRepository<JobFile> JobFileRepo { get; }
 		public IGenericRepository<JobSkill> JobSkillRepo { get; }
 		public IGenericRepository<Benefits> BenefitRepo { get; }
+        //do result repo for what ?? 
+		public IGenericRepository<Result> ResultRepo { get; }
 
-		private readonly DbContext _dbContext;
+        private readonly DbContext _dbContext;
 
 		public UnitOfWork(DbContext dbContext)
 		{
