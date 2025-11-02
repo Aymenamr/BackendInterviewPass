@@ -50,9 +50,12 @@ public partial class InterviewPassContext : DbContext
 	public virtual DbSet<JobFile> JobFiles { get; set; }
 
 	public virtual DbSet<JobSkill> JobSkills { get; set; }
+   // public virtual DbSet<Result> Results { get; set; }
 
 
-	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{ 
 		 optionsBuilder.UseSqlite(string.Format("DataSource={0}", DbPath));
 		// تفعيل المفاتيح الأجنبية

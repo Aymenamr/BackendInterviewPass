@@ -75,7 +75,7 @@ namespace InterviewPass.WebApi.Mapper
 			: new List<string>()));
 			//do my map with result entity and model
 
-         CreateMap<Result, ResultModel>().ReverseMap();
+         CreateMap<Result,ResultModel>().ReverseMap();
 
         }
        

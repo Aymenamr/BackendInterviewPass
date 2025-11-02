@@ -19,6 +19,8 @@ namespace InterviewPass.DataAccess.UnitOfWork
         //do result repo for what ?? 
 		public IGenericRepository<Result> ResultRepo { get; }
 
+        public IGenericRepository<Result> resultRepo { get; }
+
         private readonly DbContext _dbContext;
 
 		public UnitOfWork(DbContext dbContext)
@@ -33,7 +35,8 @@ namespace InterviewPass.DataAccess.UnitOfWork
 			JobFileRepo = new GenericRepository<JobFile>(_dbContext);
 			BenefitRepo = new GenericRepository<Benefits>(_dbContext);
 			JobSkillRepo = new GenericRepository<JobSkill>(_dbContext);
-		}
+            resultRepo = new GenericRepository<Result>(_dbContext);
+        }
 
 		public void Save()
 		{
