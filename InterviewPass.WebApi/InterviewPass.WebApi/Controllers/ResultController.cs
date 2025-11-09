@@ -8,6 +8,7 @@ using Swashbuckle.AspNetCore.Filters;
 using InterviewPass.WebApi.Processors;
 using System.Security.Cryptography.X509Certificates;
 using Duende.IdentityServer.Extensions;
+using InterviewPass.DataAccess.UnitOfWork;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,116 +18,106 @@ namespace InterviewPass.WebApi.Controllers
     [ApiController]
     public class ResultController : ControllerBase
     {
-        //to rrack the values need learn that 
         private readonly ILogger<ResultController> _logger;
-        //
-        private readonly IGenericRepository<Result> _resultRepository;
-        private readonly IGenericRepository<User> _userRepository;
-        private readonly IGenericRepository<Exam> _examRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IGenericRepository<UserJobSeeker> _userRepository;
 
-
-        public ResultController(ILogger<ResultController> logger, IGenericRepository<Result> resultRepository, IGenericRepository<User> userRepository, IGenericRepository<Exam> examRepository, IMapper mapper)
+        public ResultController(
+            ILogger<ResultController> logger,
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            IGenericRepository<UserJobSeeker> userRepository)
         {
             _logger = logger;
-            _resultRepository = resultRepository;
-            _userRepository = userRepository;
-            _examRepository = examRepository;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _userRepository = userRepository;
         }
-
 
         // GET: api/<ResultController>
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Ok(_mapper.Map<List<ResultModel>>(_resultRepository.GetAll()));
+            return Ok(_mapper.Map<List<ResultModel>>(_unitOfWork.ResultRepo.GetAll()));
         }
 
         // GET api/<ResultController>/5
         [HttpGet("{id}")]
         public IActionResult GetResultsById(string id)
         {
-            var resultEntity = _resultRepository.GetByProperty(result => result.Id == id);
+            var resultEntity = _unitOfWork.ResultRepo.GetByProperty(result => result.Id == id);
             if (resultEntity == null)
             {
-                return NotFound("result not found");
+                return NotFound("Result not found");
             }
-            return Ok(_mapper.Map<Result>(resultEntity));
+            return Ok(_mapper.Map<ResultModel>(resultEntity));
         }
 
         // POST api/<ResultController>
         [HttpPost]
         public IActionResult Post([FromBody] ResultModel result)
         {
-
-
-            // search on the user entity exists
-
-            if (!string.IsNullOrWhiteSpace(result.UserId))
+            // Validate if result with same ID already exists
+            if (_unitOfWork.ResultRepo.GetByProperty(r => r.Id == result.Id) != null)
             {
-                var userExcests = _userRepository.GetByProperty(user => user.Id == result.UserId) != null;
-                if (!userExcests)
-                {
-                    return BadRequest("userid not exists");
-                }
-
+                return Conflict("The Result already exists!");
             }
 
-            // serarch on the result entity exists
-
-            if (!string.IsNullOrWhiteSpace(result.ExamId))
+            // Validate user exists
+            if (!string.IsNullOrWhiteSpace(result.UserId) && 
+                _userRepository.GetByProperty(user => user.Id == result.UserId) == null)
             {
-                var examExcests = _examRepository.GetByProperty(exam => exam.Id == result.ExamId) != null;
-                if (!examExcests)
-                {
-                    return BadRequest("examid not exists");
-                }
-
-            }
-            if (_resultRepository.GetByProperty(r => r.Id == result.Id) != null)
-            {
-                return Conflict("The Result is already Exists !");
+                return BadRequest("User ID does not exist");
             }
 
-            //mapping the entity
+            // Validate exam exists
+            if (!string.IsNullOrWhiteSpace(result.ExamId) && 
+                _unitOfWork.ExamRepo.GetByProperty(exam => exam.Id == result.ExamId) == null)
+            {
+                return BadRequest("Exam ID does not exist");
+            }
+
+            // Map and save the result
             var resultEntity = _mapper.Map<Result>(result);
+            _unitOfWork.ResultRepo.Add(resultEntity);
+            _unitOfWork.Save();
 
-            // 3. Add and commit to database
-            _resultRepository.Add(resultEntity);
-            //save to database 
-            _resultRepository.Commit();
-
-            // 5. Return proper CreatedAtAction response
             return CreatedAtAction(nameof(GetAll), new { Id = resultEntity.Id }, result);
-
-
         }
-            // PUT api/<ResultController>/5
-            [HttpPut("{id}")]
-            public IActionResult Put(string id, [FromBody] ResultModel resultModel)
+        // PUT api/<ResultController>/5
+        [HttpPut("{id}")]
+        public IActionResult Put(string id, [FromBody] ResultModel resultModel)
+        {
+            var existingResult = _unitOfWork.ResultRepo.GetByProperty(r => r.Id == id);
+            if (existingResult == null)
             {
-            var resultEntity = _resultRepository.GetByProperty(r => r.Id == id);
-                if (resultEntity == null)
-                    return NotFound($"result with this ID {id} not found");
-
-            _resultRepository.Update(resultEntity);
-            return Ok(_mapper.Map<Result>(resultModel));
+                return NotFound($"Result with ID {id} not found");
             }
 
+            // Map the updated values from model to existing entity
+            _mapper.Map(resultModel,existingResult);
+       
+            // Update and save
+            _unitOfWork.ResultRepo.Update(existingResult);
+            _unitOfWork.Save();
+
+            return Ok(_mapper.Map<ResultModel>(existingResult));
+        }
         // DELETE api/<ResultController>/5
         [HttpDelete("{id}")]
         //public is notvalid for this method ???
         public IActionResult Delete(string id)
         {
-            Result result = _resultRepository.GetByProperty(r => r.Id == id);
+            var result = _unitOfWork.ResultRepo.GetByProperty(r => r.Id == id);
             if (result == null)
             {
-                return NotFound($"No result Found with this ID {id}");
+                return NotFound($"No result found with ID {id}");
             }
 
-            _resultRepository.Delete(result);
-            return Ok("result deleted");
+            _unitOfWork.ResultRepo.Delete(result);
+            _unitOfWork.Save();
+            return Ok("Result deleted successfully");
         }
     }
 } 

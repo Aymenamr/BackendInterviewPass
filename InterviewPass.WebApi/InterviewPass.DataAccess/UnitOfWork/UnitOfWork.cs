@@ -35,12 +35,13 @@ namespace InterviewPass.DataAccess.UnitOfWork
 			JobFileRepo = new GenericRepository<JobFile>(_dbContext);
 			BenefitRepo = new GenericRepository<Benefits>(_dbContext);
 			JobSkillRepo = new GenericRepository<JobSkill>(_dbContext);
-            resultRepo = new GenericRepository<Result>(_dbContext);
+            ResultRepo = new GenericRepository<Result>(_dbContext);
         }
 
 		public void Save()
 		{
 			_dbContext.SaveChanges();
+			
 		}
 
 	}
