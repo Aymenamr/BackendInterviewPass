@@ -112,10 +112,10 @@ namespace InterviewPass.WebApi.Controllers
 			if (existingJob == null)
 				return NotFound($"Job with ID {id} not found");
 
-			JobModel jobToReturn = _jobProcessor.ProcessUpdateJob
-				(id, jobModel);
+			JobModel jobToReturn = _jobProcessor.ProcessUpdateJob(id, jobModel);
 
-			return Ok(_mapper.Map<JobModel>(jobToReturn));
+
+            return Ok(_mapper.Map<JobModel>(jobToReturn));
 		}
 
 		/// <summary>
