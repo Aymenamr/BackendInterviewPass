@@ -4,11 +4,10 @@ using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.WebApi.Enums;
 using InterviewPass.WebApi.Examples;
 using InterviewPass.WebApi.Extensions;
-using InterviewPass.WebApi.Mapper;
 using InterviewPass.WebApi.Models.User;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Filters;
-using System;
+using System.Text;
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -117,6 +116,11 @@ namespace InterviewPass.WebApi.Controllers
         public IActionResult Post([FromBody] UserModel user)
         {
             User userEntity = user.GetUserEntiy(_mapper);
+            if (!string.IsNullOrEmpty(user.PasswordHash))
+            {
+                byte[] hashBytes = Encoding.UTF8.GetBytes(user.PasswordHash);
+                userEntity.PasswordHash = Convert.ToBase64String(hashBytes);
+            }
             UserType userType = (user is UserJobSeekerModel) ? UserType.JobSeeker : UserType.Hr;
             if (_userRepoResolver(userType.ToString()).GetUser(user.Login) == null)
             {
