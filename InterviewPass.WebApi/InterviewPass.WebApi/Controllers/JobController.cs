@@ -114,7 +114,8 @@ namespace InterviewPass.WebApi.Controllers
 
 			JobModel jobToReturn = _jobProcessor.ProcessUpdateJob(id, jobModel);
 
-			return Ok(_mapper.Map<JobModel>(jobToReturn));
+
+            return Ok(_mapper.Map<JobModel>(jobToReturn));
 		}
 
 		/// <summary>

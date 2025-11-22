@@ -14,7 +14,9 @@ namespace InterviewPass.DataAccess.UnitOfWork
 		IGenericRepository<JobFile> JobFileRepo { get; }
 		IGenericRepository<JobSkill> JobSkillRepo { get; }
 		IGenericRepository<Benefits> BenefitRepo { get; }
+        IGenericRepository<Result> ResultRepo { get; }
 
-		void Save();
+
+        void Save();
 	}
 }

@@ -33,6 +33,7 @@ namespace InterviewPass.WebApi.Mapper
 							src.QuestionExams.Select(qe =>
 								qe.IdQuestionNavigation.GetQuestionModel())))
 				.ForMember(dest => dest.Author, opt => opt.MapFrom(src => src.CreatedBy));
+			
 			CreateMap<Field, FieldModel>().ReverseMap();
 			CreateMap<Skill, SkillModel>().ReverseMap();
 			CreateMap<MultipleChoiceQuestion, MultipleChoiceQuestionModel>().ReverseMap();
@@ -72,8 +73,12 @@ namespace InterviewPass.WebApi.Mapper
 				.Select(jf => Convert.ToBase64String(jf.File))
 				.ToList()
 			: new List<string>()));
+			//do my map with result entity and model
 
-		}
-	}
+         CreateMap<Result,ResultModel>().ReverseMap();
+
+        }
+       
+    }
 }
 
