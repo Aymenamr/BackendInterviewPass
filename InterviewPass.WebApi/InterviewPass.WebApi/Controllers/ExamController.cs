@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using InterviewPass.WebApi.Examples;
 using Swashbuckle.AspNetCore.Filters;
 using InterviewPass.WebApi.Processors;
+using InterviewPass.WebApi.Models.Question;
+using InterviewPass.WebApi.Validators.Exam;
 
 
 namespace InterviewPass.WebApi.Controllers
@@ -18,14 +20,24 @@ namespace InterviewPass.WebApi.Controllers
         private readonly IGenericRepository<Exam> _examRepository;
         private readonly IMapper _mapper;
         private readonly IExamProcessor _examProcessor;
+        private readonly IExamValidator _examValidator;
 
-        public ExamController(ILogger<ExamController> logger, IGenericRepository<Exam> examRepository, IMapper mapper,IExamProcessor examProcessor)
+
+        public ExamController(
+             ILogger<ExamController> logger,
+             IGenericRepository<Exam> examRepository,
+             IMapper mapper,
+             IExamProcessor examProcessor,
+             IExamValidator examValidator)
         {
             _logger = logger;
             _examRepository = examRepository;
             _mapper = mapper;
             _examProcessor = examProcessor;
+            _examValidator = examValidator;  
         }
+
+
         /// <summary>
         /// return the list of all exams 
         /// </summary>
@@ -70,21 +82,9 @@ namespace InterviewPass.WebApi.Controllers
         [HttpPost]
         [SwaggerRequestExample(typeof(ExamModel), typeof(ExamExampleDocumentation))]
         public IActionResult Post([FromBody] ExamModel exam)
-        {            
-            if (_examRepository.GetByProperty(e => e.Name == exam.Name) != null)
-            {
-                return Conflict("The Exam name already Exists !");
-            }
-            if (exam.Questions.Any())
-            {
-                if (exam.Questions.Count != exam.NbrOfQuestion)
-                {
-                    return BadRequest("The number of questions is not equal to the number of questions introduced");
-                }
-                exam.MaxScore = exam.Questions.Sum(q => q.Score);
-            }
-
-            _examProcessor.ProcessExam(exam);           
+        {
+            _examValidator.Validate(exam);
+            _examProcessor.ProcessExam(exam);          
             return CreatedAtAction(nameof(Post), new { id = exam.Id }, exam);
         }
 

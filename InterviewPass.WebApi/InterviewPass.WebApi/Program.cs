@@ -10,6 +10,7 @@ using InterviewPass.WebApi.Mapper;
 using InterviewPass.WebApi.Models.Question;
 using InterviewPass.WebApi.Models.User;
 using InterviewPass.WebApi.Processors;
+using InterviewPass.WebApi.Validators.Exam;
 using JsonSubTypes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -91,6 +92,7 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
         });
 
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<IExamValidator, ExamValidator>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
