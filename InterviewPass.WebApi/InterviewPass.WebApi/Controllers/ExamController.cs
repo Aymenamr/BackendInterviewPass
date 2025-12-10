@@ -5,9 +5,9 @@ using InterviewPass.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using InterviewPass.WebApi.Examples;
 using Swashbuckle.AspNetCore.Filters;
-using InterviewPass.WebApi.Processors;
 using InterviewPass.WebApi.Models.Question;
 using InterviewPass.WebApi.Validators.Exam;
+using InterviewPass.WebApi.Processors.Exam;
 
 
 namespace InterviewPass.WebApi.Controllers
