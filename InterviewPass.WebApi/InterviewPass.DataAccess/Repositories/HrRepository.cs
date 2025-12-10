@@ -36,8 +36,12 @@ namespace InterviewPass.DataAccess.Services
 		{
 			return _dbContext.UserJobSeekers.Include(user => user.SkillBySeekers).ThenInclude(sbs => sbs.Skill).FirstOrDefault(user => user.Email == email);
 		}
+        public User GetUserById(string id)
+        {
+            return _dbContext.UserHrs.FirstOrDefault(x => x.Id == id);
+        }
 
-		public List<User> GetUsers()
+        public List<User> GetUsers()
 		{
 			List<User> hrs = [.. _dbContext.UserHrs.ToList()];
 			return hrs;

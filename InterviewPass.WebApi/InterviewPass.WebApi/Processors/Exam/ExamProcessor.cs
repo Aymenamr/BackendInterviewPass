@@ -4,27 +4,26 @@ using InterviewPass.DataAccess.Entities.Questions;
 using InterviewPass.DataAccess.UnitOfWork;
 using InterviewPass.WebApi.Extensions;
 using InterviewPass.WebApi.Models;
+using InterviewPass.WebApi.Processors.Exam;
 using Microsoft.AspNetCore.Mvc;
 using SQLitePCL;
 
-namespace InterviewPass.WebApi.Processors
-{
     public class ExamProcessor : IExamProcessor
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public ExamProcessor(IUnitOfWork unitOfWork,IMapper mapper)
-        { 
+        public ExamProcessor(IUnitOfWork unitOfWork, IMapper mapper)
+        {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
         public ExamModel ProcessExam(ExamModel exam)
-        {          
+        {
 
             Exam examEntity = _mapper.Map<Exam>(exam);
-            List<string> idQuestions = new List<string> ();
-            
+            List<string> idQuestions = new List<string>();
+
             //Add the Questions with their possibilities
             foreach (var question in exam.Questions)
             {
@@ -45,9 +44,9 @@ namespace InterviewPass.WebApi.Processors
                            IdExam = idExam
                        });
             }
-            exam.Id  = idExam;
+            exam.Id = idExam;
             _unitOfWork.Save();
-            return exam;    
+            return exam;
         }
     }
-}
+

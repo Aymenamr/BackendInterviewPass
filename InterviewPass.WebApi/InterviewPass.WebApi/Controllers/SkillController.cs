@@ -4,6 +4,10 @@ using InterviewPass.DataAccess.Repositories;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using AutoMapper;
 using InterviewPass.WebApi.Models;
+using InterviewPass.WebApi.Processors.Exam;
+using InterviewPass.WebApi.Validators.Exam;
+using InterviewPass.WebApi.Processors.Skill;
+using InterviewPass.WebApi.Validators.Skill;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,12 +21,16 @@ namespace InterviewPass.WebApi.Controllers
         private readonly IGenericRepository<Skill> _skillRepository;
         private readonly IGenericRepository<Field> _fieldRepository;
         private readonly IMapper _mapper;
-        public SkillController(ILogger<SkillController> logger, IGenericRepository<Skill> skillRepository, IGenericRepository<Field> fieldRepository, IMapper mapper)
+        private readonly ISkillProcessor _skillProcessor;
+        private readonly ISkillValidator _skillValidator;
+        public SkillController(ILogger<SkillController> logger, IGenericRepository<Skill> skillRepository, IGenericRepository<Field> fieldRepository, IMapper mapper, ISkillProcessor skillProcessor, ISkillValidator skillValidator)
         {
             _logger = logger;
             _skillRepository = skillRepository;
             _fieldRepository = fieldRepository;
             _mapper = mapper;
+            _skillProcessor=skillProcessor;
+            _skillValidator = skillValidator;
         }
 
         /// <summary>
@@ -70,18 +78,11 @@ namespace InterviewPass.WebApi.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] SkillModel skill)
         {
-            if (string.IsNullOrEmpty(skill.Name) || string.IsNullOrWhiteSpace(skill.FieldId))
-                return BadRequest("Name or FieldId cannot be null");
+            _skillValidator.Validate(skill);
 
-            var skillEntity = _mapper.Map<Skill>(skill);
+            var result = _skillProcessor.ProcessSkill(skill);
 
-            if (_skillRepository.GetByProperty(sk => sk.Name == skill.Name) != null)
-                return Conflict("Skill already exists");
-
-            _skillRepository.Add(skillEntity);
-            _skillRepository.Commit();
-            skill.Id = skillEntity.Id;
-            return CreatedAtAction(nameof(Get), new { name = skillEntity.Name }, skill);
+            return CreatedAtAction(nameof(Get), new { name = result.Name }, result); 
         }
 
         /// <summary>
