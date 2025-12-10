@@ -29,27 +29,33 @@ namespace InterviewPass.Infrastructure.Middlewares
 				await HandleExceptionAsync(context, ex);
 			}
 		}
-		private Task HandleExceptionAsync(HttpContext context, Exception exception)
-		{
-			if (exception is NotFoundException)
-			{
-				context.Response.StatusCode = StatusCodes.Status404NotFound;
-				return context.Response.WriteAsync(JsonConvert.SerializeObject(new
-				{
-					msg = exception.Message,
-					status = 404
-				}));
-			}
-			_logger.LogError(exception, "Unexpected Exception occured");
-			var response = new JsonExceptionResponse
-			{
-				msg = "An unexpected error occurred. Please contact an administrator.",
-				status = (int)HttpStatusCode.InternalServerError
-			};
+        private Task HandleExceptionAsync(HttpContext context, Exception exception)
+        {
+            context.Response.ContentType = "application/json";
 
-			context.Response.ContentType = "application/json";
-			context.Response.StatusCode = response.status;
-			return context.Response.WriteAsync(JsonConvert.SerializeObject(response));
-		}
-	}
+            if (exception is NotFoundException)
+            {
+                 context.Response.StatusCode = StatusCodes.Status404NotFound;
+
+                return context.Response.WriteAsync(JsonConvert.SerializeObject(new
+                {
+                    msg = exception.Message,
+                    status = 404
+                }));
+            }
+
+            _logger.LogError(exception, "Unexpected Exception occured");
+
+            var response = new JsonExceptionResponse
+            {
+                msg = "An unexpected error occurred. Please contact an administrator.",
+                status = (int)HttpStatusCode.InternalServerError
+            };
+
+            context.Response.StatusCode = response.status;
+
+            return context.Response.WriteAsync(JsonConvert.SerializeObject(response));
+        }
+
+    }
 }

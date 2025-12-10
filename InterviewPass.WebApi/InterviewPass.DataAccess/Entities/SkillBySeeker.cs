@@ -5,7 +5,7 @@ namespace InterviewPass.DataAccess.Entities;
 
 public partial class SkillBySeeker
 {
-    public int Id { get; set; }
+    public string? Id { get; set; }
 
     public string? SkillId { get; set; }
 
