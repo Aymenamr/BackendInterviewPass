@@ -1,7 +1,7 @@
 ﻿using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using InterviewPass.Infrastructure.Exceptions;
+
 namespace InterviewPass.DataAccess.Services
 {
 	public class JobSeekerRepository : IUserRepository
@@ -12,34 +12,16 @@ namespace InterviewPass.DataAccess.Services
 			_dbContext = dbContext as InterviewPassContext;
 		}
 
-        public void AddUser(User user)
-        {
-            var seeker = user as UserJobSeeker;
+		public void AddUser(User user)
+		{
+			var seeker = user as UserJobSeeker;
+			seeker.Id = Guid.NewGuid().ToString();
+			_dbContext.UserJobSeekers.Add(seeker);
+			_dbContext.SaveChanges();
+			user = GetUser(user.Login); // update the user entity object with the skills info
+		}
 
-            // Validate skills BEFORE saving
-            if (seeker.SkillBySeekers != null && seeker.SkillBySeekers.Any())
-            {
-                var skillIds = seeker.SkillBySeekers.Select(s => s.Id).ToList();
-
-                var validSkillIds = _dbContext.Skills
-                    .Where(s => skillIds.Contains(s.Id))
-                    .Select(s => s.Id)
-                    .ToList();
-                var missingSkills = skillIds.Except(validSkillIds).ToList();
-                if (missingSkills.Any())
-                {
-					throw new NotFoundException("Invalid Skill IDs provided. Some skills do not exist") ;
-                }
-            }
-            seeker.Id = Guid.NewGuid().ToString();
-            _dbContext.UserJobSeekers.Add(seeker);
-            _dbContext.SaveChanges();
-
-           
-        }
-
-
-        public void DeleteUser(string id)
+		public void DeleteUser(string id)
 		{
 			_dbContext.UserJobSeekers.Remove(GetUser(id) as UserJobSeeker);
 			_dbContext.SaveChanges();

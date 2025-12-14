@@ -1,4 +1,6 @@
-﻿using InterviewPass.DataAccess.Entities;
+﻿using FluentValidation.AspNetCore;
+using FluentValidation;
+using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories;
 using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.DataAccess.Services;
@@ -10,6 +12,7 @@ using InterviewPass.WebApi.Mapper;
 using InterviewPass.WebApi.Models.Question;
 using InterviewPass.WebApi.Models.User;
 using InterviewPass.WebApi.Processors;
+using InterviewPass.WebApi.Validators;
 using JsonSubTypes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -65,7 +68,8 @@ else
     File.WriteAllText(jsonFilePath, updatedJson);
 }
 
-
+ 
+   
 // Add services to the container.
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
@@ -159,6 +163,10 @@ builder.Services
                               .AllowAnyHeader()
                               .AllowAnyMethod());
     });
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<AddUsersRequestValidator>();
+
 
 var app = builder.Build();
 
