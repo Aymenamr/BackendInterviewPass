@@ -8,6 +8,7 @@ using InterviewPass.WebApi.Models.User;
 using InterviewPass.WebApi.Validators.Exam;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.ComponentModel.DataAnnotations;
+using InterviewPass.WebApi.Models.ResponseResult;
 
 public class ExamValidator : IExamValidator
 {
@@ -25,38 +26,72 @@ public class ExamValidator : IExamValidator
         _examRepository = examRepository;
     }
 
-    public void Validate(ExamModel exam)
+    public ApiResponse Validate(ExamModel exam)
     {
         // Validate Author Exists
         if (_hrRepository.GetUserById(exam.Author) == null)
-            throw new NotFoundException("Author not found.");
+        {
+            return new ErrorResponse
+            {
+                StatusCode = StatusCodes.Status404NotFound,
+                Message = "Author not found"
+            };
+        }
 
         // Validate Exam Name Unique
         if (_examRepository.GetByProperty(e => e.Name == exam.Name) != null)
-            throw new ValidationException("The exam name already exists.");
+        {
+            return new ErrorResponse
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = "The exam name already exists"
+            };
+        }
 
         // Validate Questions
         if (exam.Questions != null && exam.Questions.Any())
         {
             if (exam.Questions.Count != exam.NbrOfQuestion)
-                throw new ValidationException("Number of questions does not match.");
+            {
+                return new ErrorResponse
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Number of questions does not match"
+                };
+            }
 
             foreach (var q in exam.Questions)
             {
                 // Skill exists?
                 if (_skillRepository.GetByProperty(s => s.Id == q.SkillId) == null)
-                    throw new NotFoundException($"Skill '{q.SkillId}' not found.");
+                {
+                    return new ErrorResponse
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = $"Skill '{q.SkillId}' not found"
+                    };
+                }
 
                 // Check Multiple choice
                 if (q is MultipleChoiceQuestionModel mcq)
                 {
                     if (mcq.Possibilities == null || mcq.Possibilities.Count == 0)
-                        throw new ValidationException("Multiple choice question must have at least one possibility.");
+                    {
+                        return new ErrorResponse
+                        {
+                            StatusCode = StatusCodes.Status400BadRequest,
+                            Message = "Multiple choice question must have at least one possibility"
+                        };
+                    }
                 }
             }
-
-            // Calculate Max Score
-            exam.MaxScore = exam.Questions.Sum(q => q.Score);
         }
+
+        return new SuccessResponse
+        {
+            StatusCode = StatusCodes.Status200OK,
+            Message = "Validation passed"
+        };
     }
+
 }

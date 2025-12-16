@@ -8,6 +8,7 @@ using InterviewPass.WebApi.Processors.Exam;
 using InterviewPass.WebApi.Validators.Exam;
 using InterviewPass.WebApi.Processors.Skill;
 using InterviewPass.WebApi.Validators.Skill;
+using InterviewPass.WebApi.Models.ResponseResult;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -78,7 +79,11 @@ namespace InterviewPass.WebApi.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] SkillModel skill)
         {
-            _skillValidator.Validate(skill);
+            var response = _skillValidator.Validate(skill);
+            if (response is ErrorResponse errorResponse)
+            {
+                return StatusCode(errorResponse.StatusCode, errorResponse.Message);
+            }
 
             var result = _skillProcessor.ProcessSkill(skill);
 

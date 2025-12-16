@@ -1,10 +1,11 @@
 ﻿using InterviewPass.WebApi.Models;
+using InterviewPass.WebApi.Models.ResponseResult;
 
 namespace InterviewPass.WebApi.Validators.Exam
 {
     public interface IExamValidator
     {
-        void Validate(ExamModel exam);
+        ApiResponse Validate(ExamModel exam);
     }
 
 }

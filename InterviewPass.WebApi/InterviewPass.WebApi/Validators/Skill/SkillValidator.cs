@@ -5,6 +5,7 @@ using InterviewPass.WebApi.Models;
 using System.ComponentModel.DataAnnotations;
 using InterviewPass.WebApi.Validators.Skill;
 using System.Xml.Linq;
+using InterviewPass.WebApi.Models.ResponseResult;
 
 public class SkillValidator : ISkillValidator
 {
@@ -19,23 +20,54 @@ public class SkillValidator : ISkillValidator
         _skillRepository = skillRepository;
     }
 
-    public void Validate(SkillModel skill)
+    public ApiResponse Validate(SkillModel skill)
     {
         if (skill == null)
-            throw new ValidationException("Skill cannot be null.");
+        {
+            return new ErrorResponse
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = "Skill cannot be null"
+            };
+        }
 
         // Check name
         if (string.IsNullOrWhiteSpace(skill.Name))
-            throw new ValidationException("Skill name cannot be empty.");
+        {
+            return new ErrorResponse
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = "Skill name cannot be empty"
+            };
+        }
 
         // Check field exists
         var field = _fieldRepository.GetByProperty(f => f.Id == skill.FieldId);
         if (field == null)
-            throw new NotFoundException("Field not found.");
+        {
+            return new ErrorResponse
+            {
+                StatusCode = StatusCodes.Status404NotFound,
+                Message = "Field not found"
+            };
+        }
 
         // Check skill name uniqueness
         var existing = _skillRepository.GetByProperty(s => s.Name == skill.Name);
         if (existing != null)
-            throw new ValidationException("Skill name already exists.");
+        {
+            return new ErrorResponse
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = "Skill name already exists"
+            };
+        }
+
+        return new SuccessResponse
+        {
+            StatusCode = StatusCodes.Status200OK,
+            Message = "Validation passed"
+        };
     }
+
 }

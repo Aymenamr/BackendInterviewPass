@@ -1,9 +1,10 @@
 ﻿using InterviewPass.WebApi.Models;
+using InterviewPass.WebApi.Models.ResponseResult;
 
 namespace InterviewPass.WebApi.Validators.Skill
 {
     public interface ISkillValidator
     {
-        void Validate(SkillModel skill);
+        ApiResponse Validate(SkillModel skill);
     }
 }

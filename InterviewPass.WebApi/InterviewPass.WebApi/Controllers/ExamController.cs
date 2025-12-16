@@ -8,6 +8,7 @@ using Swashbuckle.AspNetCore.Filters;
 using InterviewPass.WebApi.Models.Question;
 using InterviewPass.WebApi.Validators.Exam;
 using InterviewPass.WebApi.Processors.Exam;
+using InterviewPass.WebApi.Models.ResponseResult;
 
 
 namespace InterviewPass.WebApi.Controllers
@@ -83,7 +84,12 @@ namespace InterviewPass.WebApi.Controllers
         [SwaggerRequestExample(typeof(ExamModel), typeof(ExamExampleDocumentation))]
         public IActionResult Post([FromBody] ExamModel exam)
         {
-            _examValidator.Validate(exam);
+           var result= _examValidator.Validate(exam);
+
+            if(result is ErrorResponse errorResponse)
+            {
+                return StatusCode(errorResponse.StatusCode , errorResponse.Message);
+            }
             _examProcessor.ProcessExam(exam);          
             return CreatedAtAction(nameof(Post), new { id = exam.Id }, exam);
         }
