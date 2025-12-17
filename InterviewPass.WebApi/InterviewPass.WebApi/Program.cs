@@ -164,8 +164,7 @@ builder.Services
                               .AllowAnyMethod());
     });
 
-builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddValidatorsFromAssemblyContaining<AddUsersRequestValidator>();
+ builder.Services.AddValidatorsFromAssemblyContaining<AddUsersRequestValidator>();
 
 
 var app = builder.Build();

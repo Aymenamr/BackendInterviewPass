@@ -5,9 +5,12 @@ using InterviewPass.WebApi.Enums;
 using InterviewPass.WebApi.Examples;
 using InterviewPass.WebApi.Extensions;
 using InterviewPass.WebApi.Models.User;
+using InterviewPass.WebApi.Validators;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
+using Microsoft.AspNetCore.Http;
+using InterviewPass.WebApi.Constants;
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -113,27 +116,36 @@ namespace InterviewPass.WebApi.Controllers
         [HttpPost]
         [SwaggerRequestExample(typeof(UserJobSeekerModel), typeof(UserExampleDocumentation))]
         [ProducesResponseType(typeof(UserJobSeekerModel), StatusCodes.Status201Created)]
-        public IActionResult Post([FromBody] UserModel user)
+        public IActionResult Post([FromBody] UserModel user, [FromServices] AddUsersRequestValidator validator)
         {
+            // 1. Validation
+            var validationResult = validator.Validate(user);
+            if (!validationResult.IsValid)
+            {
+                var firstError = validationResult.Errors[0];
+                return firstError.ErrorCode switch
+                {
+                    ValidationErrorCodes.UserConflict => Conflict(new { message = firstError.ErrorMessage }),
+                    ValidationErrorCodes.SkillsNotFound => NotFound(new { message = firstError.ErrorMessage }),
+                    _ => BadRequest("Invalid input. Please verify your data and try again.")
+                };
+            }
+
+            // 2. Logic (Only if valid)
             User userEntity = user.GetUserEntiy(_mapper);
+
             if (!string.IsNullOrEmpty(user.PasswordHash))
             {
                 byte[] hashBytes = Encoding.UTF8.GetBytes(user.PasswordHash);
                 userEntity.PasswordHash = Convert.ToBase64String(hashBytes);
             }
-            UserType userType = (user is UserJobSeekerModel) ? UserType.JobSeeker : UserType.Hr;
-            if (_userRepoResolver(userType.ToString()).GetUser(user.Login) == null)
-            {
-                _userRepoResolver(userType.ToString()).AddUser(userEntity);
-            }
-            else
-            {
-                return Conflict("The Login already Exists !");
-            }
-            user = userEntity.GetUserModel(_mapper);
-            return CreatedAtAction(nameof(Post), new { id = userEntity.Id }, user);
-        }
 
+            UserType userType = (user is UserJobSeekerModel) ? UserType.JobSeeker : UserType.Hr;
+            _userRepoResolver(userType.ToString()).AddUser(userEntity);
+
+            var result = userEntity.GetUserModel(_mapper);
+            return CreatedAtAction(nameof(Post), new { id = userEntity.Id }, result);
+        }
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
