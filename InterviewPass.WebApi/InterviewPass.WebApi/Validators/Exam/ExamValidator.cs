@@ -43,8 +43,8 @@ public class ExamValidator : IExamValidator
         {
             return new ErrorResponse
             {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = "The exam name already exists"
+                StatusCode = StatusCodes.Status409Conflict,
+                Message = "An exam with the same name already exists"
             };
         }
 
