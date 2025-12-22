@@ -2,7 +2,7 @@
 {
     public class ErrorResponse:ApiResponse
     {
-        public string Message { get; set; }
+
 
     }
 }
