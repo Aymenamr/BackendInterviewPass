@@ -10,6 +10,10 @@ using InterviewPass.WebApi.Mapper;
 using InterviewPass.WebApi.Models.Question;
 using InterviewPass.WebApi.Models.User;
 using InterviewPass.WebApi.Processors;
+using InterviewPass.WebApi.Processors.Exam;
+using InterviewPass.WebApi.Processors.Skill;
+using InterviewPass.WebApi.Validators.Exam;
+using InterviewPass.WebApi.Validators.Skill;
 using JsonSubTypes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -141,6 +145,10 @@ builder.Services.AddTransient<IExamProcessor, ExamProcessor>();
 builder.Services.AddTransient<IJobProcessor, JobProcessor>();
 builder.Services.AddTransient<JobSeekerRepository>();
 builder.Services.AddTransient<HrRepository>();
+builder.Services.AddTransient<IExamValidator, ExamValidator>();
+builder.Services.AddTransient<ISkillProcessor, SkillProcessor>();
+builder.Services.AddTransient<ISkillValidator, SkillValidator>();
+
 //builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddTransient<Func<string, IUserRepository>>(serviceProvider => key =>
 {
