@@ -10,6 +10,6 @@ namespace InterviewPass.DataAccess.Repositories.Interfaces
 		void Commit();
 		T GetByProperty(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes);
 		List<T> GetAll();
-
-	}
+        List<T> GetAll(Expression<Func<T, bool>> predicate);
+    }
 }
