@@ -77,7 +77,7 @@ public class UserValidator : IUserValidator
                 return new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status404NotFound,
-                    Message = $"Skill '{missingSkill.Name}' not found"
+                    Message = "Invalid Skill IDs provided. Some skills do not exist"
                 };
             }
         }
