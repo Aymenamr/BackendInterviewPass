@@ -4,7 +4,10 @@ using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.WebApi.Enums;
 using InterviewPass.WebApi.Examples;
 using InterviewPass.WebApi.Extensions;
+using InterviewPass.WebApi.Models.ResponseResult;
 using InterviewPass.WebApi.Models.User;
+using InterviewPass.WebApi.Validators.Skill;
+using InterviewPass.WebApi.Validators.user;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
@@ -20,14 +23,16 @@ namespace InterviewPass.WebApi.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly Func<string, IUserRepository> _userRepoResolver;
+        private readonly IUserValidator _userValidator;
 
 
         private readonly IMapper _mapper;
-        public UserController(ILogger<UserController> logger, Func<string, IUserRepository> userRepoResolver, IMapper mapper)
+        public UserController(ILogger<UserController> logger, Func<string, IUserRepository> userRepoResolver, IMapper mapper , IUserValidator userValidator)
         {
             _logger = logger;
             _userRepoResolver = userRepoResolver;
             _mapper = mapper;
+            _userValidator = userValidator;
         }
 
         /// <summary>
@@ -115,21 +120,27 @@ namespace InterviewPass.WebApi.Controllers
         [ProducesResponseType(typeof(UserJobSeekerModel), StatusCodes.Status201Created)]
         public IActionResult Post([FromBody] UserModel user)
         {
+            var validationResult = _userValidator.Validate(user);
+
+            if (validationResult is ErrorResponse error)
+            {
+                return StatusCode(error.StatusCode, error.Message);
+            }
+
+            UserType userType = user is UserJobSeekerModel
+                ? UserType.JobSeeker
+                : UserType.Hr;
+
             User userEntity = user.GetUserEntiy(_mapper);
-            if (!string.IsNullOrEmpty(user.PasswordHash))
+
+             if (!string.IsNullOrEmpty(user.PasswordHash))
             {
                 byte[] hashBytes = Encoding.UTF8.GetBytes(user.PasswordHash);
                 userEntity.PasswordHash = Convert.ToBase64String(hashBytes);
             }
-            UserType userType = (user is UserJobSeekerModel) ? UserType.JobSeeker : UserType.Hr;
-            if (_userRepoResolver(userType.ToString()).GetUser(user.Login) == null)
-            {
-                _userRepoResolver(userType.ToString()).AddUser(userEntity);
-            }
-            else
-            {
-                return Conflict("The Login already Exists !");
-            }
+
+            _userRepoResolver(userType.ToString()).AddUser(userEntity);
+
             user = userEntity.GetUserModel(_mapper);
             return CreatedAtAction(nameof(Post), new { id = userEntity.Id }, user);
         }

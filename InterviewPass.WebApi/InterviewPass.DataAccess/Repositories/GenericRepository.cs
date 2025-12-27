@@ -55,7 +55,12 @@ namespace InterviewPass.DataAccess.Repositories
 			return _dbSet.ToList();
 		}
 
-		private void AssignGuidIfNeeded(T entity)
+        public List<T> GetAll(Expression<Func<T, bool>> predicate)
+        {
+            return _dbSet.Where(predicate).ToList();
+        }
+
+        private void AssignGuidIfNeeded(T entity)
 		{
 			var type = typeof(T);
 			var idProperty = type.GetProperty("Id", BindingFlags.Public | BindingFlags.Instance);

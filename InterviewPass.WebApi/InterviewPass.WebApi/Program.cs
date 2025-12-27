@@ -24,6 +24,7 @@ using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using InterviewPass.WebApi.Validators.user;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -148,6 +149,7 @@ builder.Services.AddTransient<HrRepository>();
 builder.Services.AddTransient<IExamValidator, ExamValidator>();
 builder.Services.AddTransient<ISkillProcessor, SkillProcessor>();
 builder.Services.AddTransient<ISkillValidator, SkillValidator>();
+builder.Services.AddTransient<IUserValidator, UserValidator>();
 
 //builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddTransient<Func<string, IUserRepository>>(serviceProvider => key =>
