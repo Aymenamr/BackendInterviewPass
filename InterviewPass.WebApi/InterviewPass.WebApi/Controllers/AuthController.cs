@@ -1,107 +1,39 @@
 ﻿using AutoMapper;
-using InterviewPass.DataAccess.Entities;
-using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.WebApi.Extensions;
 using InterviewPass.WebApi.Models.User;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 
-namespace InterviewPass.WebApi.Controllers
+[ApiController]
+[Route("api/auth")]
+public class AuthController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class AuthController : ControllerBase
+    private readonly IUserAuthService _authService;
+    private readonly ITokenService _tokenService;
+    private readonly IMapper _mapper;
+
+    public AuthController(
+        IUserAuthService authService,
+        ITokenService tokenService,
+        IMapper mapper)
     {
+        _authService = authService;
+        _tokenService = tokenService;
+        _mapper = mapper;
+    }
 
-        private readonly Func<string, IUserRepository> _userRepoResolver;
-        private readonly IConfiguration _configuration;
+    [HttpPost("login")]
+    public IActionResult Login(LoginViewModel model)
+    {
+        var user = _authService.Authenticate(model.Email, model.Password);
 
-        private readonly IMapper _mapper;
-        public AuthController(IConfiguration configuration, Func<string, IUserRepository> userRepoResolver, IMapper mapper)
+        if (user == null)
+            return Unauthorized("Invalid email or password");
+
+        return Ok(new
         {
-            _configuration = configuration;
-            _userRepoResolver = userRepoResolver;
-            _mapper = mapper;
-
-        }
-        [HttpPost("login")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Login([FromBody] LoginViewModel loginModel)
-        {
-
-            // Find user by email/login
-            var user = _userRepoResolver("JobSeeker").GetUserByEmail(loginModel.Email) ??
-                       _userRepoResolver("Hr").GetUserByEmail(loginModel.Email);
-
-            if (user == null)
-            {
-                return Unauthorized("Invalid email or password");
-            }
-            // Decode Base64 to get the original hash from database
-            string originalHashFromDB;
-
-            byte[] hashBytes = Convert.FromBase64String(user.PasswordHash);
-            originalHashFromDB = Encoding.UTF8.GetString(hashBytes);
-
-            // Frontend sends hashed password, compare hashes directly
-            // loginModel.Password is already hashed by frontend 
-            if (originalHashFromDB != loginModel.Password)
-            {
-                return Unauthorized("Invalid password");
-            }
-            var token = GenerateJwtToken(user);
-
-            return Ok(new
-            {
-                Token = token,
-                User = user.GetUserModel(_mapper),
-                Message = "Login successful"
-            });
-
-
-        }
-
-        private string GenerateJwtToken(User user)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            var encryptedSecret = _configuration["JwtSettings:SecretKey"];
-            byte[] encryptedBytes = Convert.FromBase64String(encryptedSecret);
-            byte[] decryptedBytes = ProtectedData.Unprotect(
-                encryptedBytes,
-                null,
-                DataProtectionScope.LocalMachine // or CurrentUser 
-            );
-            string secretKey = Encoding.UTF8.GetString(decryptedBytes);
-
-            var key = Encoding.UTF8.GetBytes(secretKey);
-
-
-            var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Name, user.Name),
-            new Claim("UserType", user.GetType().ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddHours(int.Parse(_configuration["JwtSettings:ExpiryInHours"])),
-                Issuer = _configuration["JwtSettings:Issuer"],
-                Audience = _configuration["JwtSettings:Audience"],
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
+            Token = _tokenService.GenerateToken(user),
+            User = user.GetUserModel(_mapper),
+               Message = "Login successful"
+        });
     }
 }
