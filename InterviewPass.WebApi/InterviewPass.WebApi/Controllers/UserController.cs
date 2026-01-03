@@ -24,15 +24,19 @@ namespace InterviewPass.WebApi.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly Func<string, IUserRepository> _userRepoResolver;
         private readonly IUserValidator _userValidator;
+        private readonly IPasswordService _passwordService;
+
 
 
         private readonly IMapper _mapper;
-        public UserController(ILogger<UserController> logger, Func<string, IUserRepository> userRepoResolver, IMapper mapper , IUserValidator userValidator)
+        public UserController(ILogger<UserController> logger, Func<string, IUserRepository> userRepoResolver, IMapper mapper , IUserValidator userValidator , IPasswordService  passwordService)
         {
             _logger = logger;
             _userRepoResolver = userRepoResolver;
             _mapper = mapper;
             _userValidator = userValidator;
+                _passwordService = passwordService;
+
         }
 
         /// <summary>
@@ -133,11 +137,14 @@ namespace InterviewPass.WebApi.Controllers
 
             User userEntity = user.GetUserEntiy(_mapper);
 
-             if (!string.IsNullOrEmpty(user.PasswordHash))
+
+
+            if (!string.IsNullOrWhiteSpace(user.Password))
             {
-                byte[] hashBytes = Encoding.UTF8.GetBytes(user.PasswordHash);
-                userEntity.PasswordHash = Convert.ToBase64String(hashBytes);
+                userEntity.PasswordHash =
+                    _passwordService.Hash(userEntity, user.Password);
             }
+
 
             _userRepoResolver(userType.ToString()).AddUser(userEntity);
 

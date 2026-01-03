@@ -28,47 +28,32 @@ using InterviewPass.WebApi.Validators.user;
 
 
 var builder = WebApplication.CreateBuilder(args);
+ 
+builder.Services.AddScoped<IUserAuthService, UserAuthService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddSingleton<IJwtSecretProvider, JwtSecretProvider>();
 
 
-bool tagProtected = bool.Parse(builder.Configuration["JwtSettings:TagProtected"]);
-var entropy = Encoding.UTF8.GetBytes("MySuperSecretEntropyKey@2025!");
+var secretProvider = builder.Services.BuildServiceProvider()
+    .GetRequiredService<IJwtSecretProvider>();
 
-string decryptedSecret;
-
-if (tagProtected == true)
-{
-
-    var encryptedBase64 = builder.Configuration["JwtSettings:SecretKey"];
-    byte[] encryptedBytes = Convert.FromBase64String(encryptedBase64);
-
-    byte[] decryptedBytes = ProtectedData.Unprotect(
-        encryptedBytes,
-        entropy,
-        DataProtectionScope.LocalMachine
-    );
-
-    decryptedSecret = Encoding.UTF8.GetString(decryptedBytes);
-}
-else
-{
-    decryptedSecret = builder.Configuration["JwtSettings:SecretKey"];
-
-    byte[] plainBytes = Encoding.UTF8.GetBytes(decryptedSecret);
-    byte[] encryptedBytes = ProtectedData.Protect(
-        plainBytes,
-        entropy,
-        DataProtectionScope.LocalMachine
-    );
-    string encryptedBase64 = Convert.ToBase64String(encryptedBytes);
-
-    var jsonFilePath = "appsettings.json";
-    var jsonText = File.ReadAllText(jsonFilePath);
-    dynamic jsonObj = Newtonsoft.Json.JsonConvert.DeserializeObject(jsonText);
-    jsonObj["JwtSettings"]["SecretKey"] = encryptedBase64;
-    jsonObj["JwtSettings"]["TagProtected"] = "true";
-    string updatedJson = Newtonsoft.Json.JsonConvert.SerializeObject(jsonObj, Newtonsoft.Json.Formatting.Indented);
-    File.WriteAllText(jsonFilePath, updatedJson);
-}
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+            ValidAudience = builder.Configuration["JwtSettings:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretProvider.GetSecret())),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 
 
 // Add services to the container.
@@ -94,26 +79,7 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
                     .SerializeDiscriminatorProperty()
                     .Build());
         });
-
-builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters()
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-            ValidAudience = builder.Configuration["JwtSettings:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(decryptedSecret)),
-            ClockSkew = TimeSpan.Zero
-        };
-    });
-
+ 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
