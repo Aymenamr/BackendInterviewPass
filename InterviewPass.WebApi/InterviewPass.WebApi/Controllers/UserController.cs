@@ -138,7 +138,8 @@ namespace InterviewPass.WebApi.Controllers
             User userEntity = user.GetUserEntiy(_mapper);
 
 
-            if (!string.IsNullOrWhiteSpace(user.PasswordHash))
+
+            if (!string.IsNullOrWhiteSpace(user.Password))
             {
                 userEntity.PasswordHash =
                     _passwordService.Hash(userEntity, user.Password);
