@@ -32,15 +32,16 @@ namespace InterviewPass.WebApi.Controllers
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         public async Task<IActionResult> Login([FromBody] LoginViewModel loginModel)
         {
+            string Usertype = loginModel.UserType == 1 ? "Hr" : "JobSeeker";
 
             // Find user by email/login
-            var user = _userRepoResolver("JobSeeker").GetUserByEmail(loginModel.Email) ??
-                       _userRepoResolver("Hr").GetUserByEmail(loginModel.Email);
+            var user = _userRepoResolver(Usertype).GetUserByEmail(loginModel.Email);
 
             if (user == null)
             {
                 return Unauthorized("Invalid email or password");
             }
+
             // Decode Base64 to get the original hash from database
             string originalHashFromDB;
 
@@ -69,11 +70,13 @@ namespace InterviewPass.WebApi.Controllers
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
+            var entropy = Encoding.UTF8.GetBytes("MySuperSecretEntropyKey@2025!");
             var encryptedSecret = _configuration["JwtSettings:SecretKey"];
             byte[] encryptedBytes = Convert.FromBase64String(encryptedSecret);
+
             byte[] decryptedBytes = ProtectedData.Unprotect(
                 encryptedBytes,
-                null,
+                entropy,
                 DataProtectionScope.LocalMachine // or CurrentUser 
             );
             string secretKey = Encoding.UTF8.GetString(decryptedBytes);
