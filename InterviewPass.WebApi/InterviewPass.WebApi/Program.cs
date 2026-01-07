@@ -36,6 +36,8 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddSingleton<IJwtSecretProvider, JwtSecretProvider>();
 
 
+builder.Configuration.EncryptJwtSecret();
+
 var secretProvider = builder.Services.BuildServiceProvider()
     .GetRequiredService<IJwtSecretProvider>();
 
