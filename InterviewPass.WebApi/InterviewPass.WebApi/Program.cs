@@ -25,6 +25,10 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using InterviewPass.WebApi.Validators.user;
+using Microsoft.OpenApi.Models;
+using InterviewPass.WebApi.Authorization.Requirements;
+using InterviewPass.WebApi.Authorization.Handlers;
+using Microsoft.AspNetCore.Authorization;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,6 +61,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddAuthorization(option =>
+{
+    option.AddPolicy(Policies.JobSeekerOnly, policy => policy.RequireRole(UserType.JobSeeker.ToString()));
+    option.AddPolicy(Policies.HrOnly, policy => policy.RequireRole(UserType.Hr.ToString()));
+    option.AddPolicy(Policies.HrOrJobSeeker, policy => policy.RequireRole(UserType.Hr.ToString()  , UserType.JobSeeker.ToString()));
+    option.AddPolicy(Policies.ExamOwner, policy => policy.Requirements.Add(new ExamOwnerRequirement()));
+});
+builder.Services.AddSingleton<IAuthorizationHandler, ExamOwnerHandler>();
+
 
 // Add services to the container.
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
@@ -86,6 +99,39 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+
+    options.SwaggerDoc("v1", new()
+    {
+        Title = "InterviewPass API",
+        Version = "v1"
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter: Bearer {your JWT token}"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+
+
     // Automatically include XML comments from the assembly
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
     // Enable support for examples
@@ -120,12 +166,12 @@ builder.Services.AddTransient<ISkillValidator, SkillValidator>();
 builder.Services.AddTransient<IUserValidator, UserValidator>();
 
 //builder.Services.AddScoped<IJobRepository, JobRepository>();
-builder.Services.AddTransient<Func<string, IUserRepository>>(serviceProvider => key =>
+builder.Services.AddTransient<Func<UserType, IUserRepository>>(serviceProvider => key =>
 {
     return key switch
     {
-        "JobSeeker" => serviceProvider.GetRequiredService<JobSeekerRepository>(),
-        "Hr" => serviceProvider.GetRequiredService<HrRepository>(),
+       UserType.JobSeeker => serviceProvider.GetRequiredService<JobSeekerRepository>(),
+       UserType.Hr => serviceProvider.GetRequiredService<HrRepository>(),
         _ => throw new KeyNotFoundException("Service not found.")
     };
 });
