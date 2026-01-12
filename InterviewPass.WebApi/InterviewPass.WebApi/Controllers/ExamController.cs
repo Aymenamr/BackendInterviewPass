@@ -9,6 +9,11 @@ using InterviewPass.WebApi.Models.Question;
 using InterviewPass.WebApi.Validators.Exam;
 using InterviewPass.WebApi.Processors.Exam;
 using InterviewPass.WebApi.Models.ResponseResult;
+using Microsoft.AspNetCore.Authorization;
+using InterviewPass.WebApi.Models.User;
+using InterviewPass.WebApi.Enums;
+using System.Security.Claims;
+using InterviewPass.DataAccess.UnitOfWork;
 
 
 namespace InterviewPass.WebApi.Controllers
@@ -19,9 +24,11 @@ namespace InterviewPass.WebApi.Controllers
     {
         private readonly ILogger<ExamController> _logger;
         private readonly IGenericRepository<Exam> _examRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IExamProcessor _examProcessor;
         private readonly IExamValidator _examValidator;
+        private readonly IAuthorizationService _authorizationService;
 
 
         public ExamController(
@@ -29,13 +36,19 @@ namespace InterviewPass.WebApi.Controllers
              IGenericRepository<Exam> examRepository,
              IMapper mapper,
              IExamProcessor examProcessor,
-             IExamValidator examValidator)
+             IExamValidator examValidator,
+             IAuthorizationService authorizationService,
+                IUnitOfWork unitOfWork
+
+            )
         {
             _logger = logger;
             _examRepository = examRepository;
             _mapper = mapper;
             _examProcessor = examProcessor;
-            _examValidator = examValidator;  
+            _examValidator = examValidator;
+            _authorizationService = authorizationService;
+            _unitOfWork = unitOfWork;
         }
 
 
@@ -47,10 +60,14 @@ namespace InterviewPass.WebApi.Controllers
         /// <response code="500">If there is an error retrieving the data.</response>
         // GET: api/<ExamController>
         [HttpGet]
+        [Authorize(policy: Policies.HrOrJobSeeker )]
         public IActionResult Get()
-        {           
-            return Ok(_mapper.Map<List<ExamModel>>(_examRepository.GetAll()));
+        {
+             return Ok(_mapper.Map<List<ExamModel>>(_examRepository.GetAll()));
         }
+
+
+
         /// <summary>
         /// Retrieve an exam according to his Id
         /// </summary>
@@ -61,6 +78,8 @@ namespace InterviewPass.WebApi.Controllers
         /// <response code="500">If there is an error retrieving the data.</response>
         // GET api/<ExamController>/9DBB4106-9C35-461D-B1C2-FDFDF4CEDBC0
         [HttpGet("{id}")]
+        [Authorize(policy: Policies.HrOrJobSeeker)]
+
         public IActionResult Get(string id)
         {
             var examEntity = _examRepository.GetByProperty(exam => exam.Id == id);
@@ -70,6 +89,8 @@ namespace InterviewPass.WebApi.Controllers
             }
             return Ok(_mapper.Map<Exam>(examEntity));
         }
+
+
         /// <summary>
         /// Add a new Exam to the database
         /// </summary>
@@ -82,42 +103,63 @@ namespace InterviewPass.WebApi.Controllers
         // POST api/<ExamController>
         [HttpPost]
         [SwaggerRequestExample(typeof(ExamModel), typeof(ExamExampleDocumentation))]
+        [Authorize(policy: Policies.HrOnly)]
         public IActionResult Post([FromBody] ExamModel exam)
         {
            var result= _examValidator.Validate(exam);
-
             if(result is ErrorResponse errorResponse)
             {
                 return StatusCode(errorResponse.StatusCode , errorResponse.Message);
             }
+
             _examProcessor.ProcessExam(exam);          
             return CreatedAtAction(nameof(Post), new { id = exam.Id }, exam);
         }
 
         /// <summary>
-        /// Delete an exam according to his id
+        /// Delete an exam by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        /// <response code="200">The exam was successfully deleted.</response>
-        /// <response code="404">Exam not found.</response>
-        /// <response code="400">Exam is used in some skills.</response>
-        /// <response code="500">If there is an error retrieving the data.</response>
-        // DELETE api/<ExamController>/d1010c4f-690f-4ff0-a96d-84e75241f4bb
+        /// <response code="200">Exam deleted successfully</response>
+        /// <response code="400">Exam is already used</response>
+        /// <response code="403">Unauthorized</response>
+        /// <response code="404">Exam not found</response>
         [HttpDelete("{id}")]
-        public IActionResult Delete(string id)
+        [Authorize(policy: Policies.HrOnly)]
+        public async Task<IActionResult> Delete(string id)
         {
-            Exam exam = _examRepository.GetByProperty(e => e.Id == id);
+            // Load ALL relations that can block delete
+            var exam = _unitOfWork.ExamRepo.GetByProperty(
+                e => e.Id == id,
+                e => e.QuestionExams,
+                e => e.Answers,
+                e => e.Results
+            );
+
             if (exam == null)
+                return NotFound("Exam not found");
+
+            // Ownership check
+            var authResult = await _authorizationService.AuthorizeAsync(
+                User, exam, Policies.ExamOwner);  
+
+            if (!authResult.Succeeded)
+                return StatusCode(403,"You are not allowed to delete this exam");
+
+            // Block delete if exam is already used
+            if (exam.QuestionExams.Any()
+                || exam.Answers.Any()
+                || exam.Results.Any())
             {
-                return NotFound("No exam Found with this ID");
+                return BadRequest("Exam is already used and cannot be deleted");
             }
-            if (exam.QuestionExams.Any())
-            {
-                return BadRequest("There are questions related questions");
-            }
-            _examRepository.Delete(exam);
+
+            _unitOfWork.ExamRepo.Delete(exam);
+              _unitOfWork.Save();
+
             return Ok("Exam deleted successfully");
         }
+
     }
 }
