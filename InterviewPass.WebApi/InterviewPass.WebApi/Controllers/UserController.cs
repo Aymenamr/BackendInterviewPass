@@ -8,6 +8,7 @@ using InterviewPass.WebApi.Models.ResponseResult;
 using InterviewPass.WebApi.Models.User;
 using InterviewPass.WebApi.Validators.Skill;
 using InterviewPass.WebApi.Validators.user;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
@@ -22,14 +23,14 @@ namespace InterviewPass.WebApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
-        private readonly Func<string, IUserRepository> _userRepoResolver;
+        private readonly Func<UserType, IUserRepository> _userRepoResolver;
         private readonly IUserValidator _userValidator;
         private readonly IPasswordService _passwordService;
 
 
 
         private readonly IMapper _mapper;
-        public UserController(ILogger<UserController> logger, Func<string, IUserRepository> userRepoResolver, IMapper mapper , IUserValidator userValidator , IPasswordService  passwordService)
+        public UserController(ILogger<UserController> logger, Func<UserType, IUserRepository> userRepoResolver, IMapper mapper , IUserValidator userValidator , IPasswordService  passwordService)
         {
             _logger = logger;
             _userRepoResolver = userRepoResolver;
@@ -53,7 +54,7 @@ namespace InterviewPass.WebApi.Controllers
         {
 
             // Retrieve the user from the repository
-            var user = _userRepoResolver(userType.ToString()).GetUser(login);
+            var user = _userRepoResolver(userType).GetUser(login);
 
             if (user == null)
             {
@@ -91,7 +92,7 @@ namespace InterviewPass.WebApi.Controllers
         {
             _logger.LogInformation("Get method start");
             // Retrieve users from the repository
-            var users = _userRepoResolver(userType.ToString()).GetUsers();
+            var users = _userRepoResolver(userType).GetUsers();
             switch (userType)
             {
                 case UserType.JobSeeker:
@@ -122,6 +123,7 @@ namespace InterviewPass.WebApi.Controllers
         [HttpPost]
         [SwaggerRequestExample(typeof(UserJobSeekerModel), typeof(UserExampleDocumentation))]
         [ProducesResponseType(typeof(UserJobSeekerModel), StatusCodes.Status201Created)]
+        [AllowAnonymous]
         public IActionResult Post([FromBody] UserModel user)
         {
             var validationResult = _userValidator.Validate(user);
@@ -146,7 +148,7 @@ namespace InterviewPass.WebApi.Controllers
             }
 
 
-            _userRepoResolver(userType.ToString()).AddUser(userEntity);
+            _userRepoResolver(userType ).AddUser(userEntity);
 
             user = userEntity.GetUserModel(_mapper);
             return CreatedAtAction(nameof(Post), new { id = userEntity.Id }, user);
@@ -157,7 +159,7 @@ namespace InterviewPass.WebApi.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id, UserType type)
         {
-            _userRepoResolver(type.ToString()).DeleteUser(id);
+            _userRepoResolver(type).DeleteUser(id);
             return Ok();
         }
     }

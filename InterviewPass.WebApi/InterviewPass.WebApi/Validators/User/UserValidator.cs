@@ -9,12 +9,12 @@ using InterviewPass.WebApi.Validators.user;
 public class UserValidator : IUserValidator
 {
     private readonly IGenericRepository<Skill> _skillRepository;
-    private readonly Func<string, IUserRepository> _userRepoResolver;
+    private readonly Func<UserType, IUserRepository> _userRepoResolver;
 
 
     public UserValidator(
         IGenericRepository<Skill> skillRepository,
-         Func<string, IUserRepository> userRepoResolver)
+         Func<UserType, IUserRepository> userRepoResolver)
     {
         _skillRepository = skillRepository;
         _userRepoResolver = userRepoResolver;
@@ -38,7 +38,7 @@ public class UserValidator : IUserValidator
             : UserType.Hr;
 
         // 3️  Check user existence (LOGIN)
-        var existingUser = _userRepoResolver(userType.ToString())
+        var existingUser = _userRepoResolver(userType )
             .GetUser(user.Login);
 
         if (existingUser != null)

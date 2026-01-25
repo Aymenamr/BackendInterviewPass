@@ -1,13 +1,14 @@
 ﻿using InterviewPass.DataAccess.Entities;
 using InterviewPass.DataAccess.Repositories.Interfaces;
+using InterviewPass.WebApi.Enums;
 
 public class UserAuthService : IUserAuthService
 {
-    private readonly Func<string, IUserRepository> _repoResolver;
+    private readonly Func<UserType, IUserRepository> _repoResolver;
     private readonly IPasswordService _passwordService;
 
     public UserAuthService(
-        Func<string, IUserRepository> repoResolver,
+        Func<UserType, IUserRepository> repoResolver,
         IPasswordService passwordService)
     {
         _repoResolver = repoResolver;
@@ -16,8 +17,8 @@ public class UserAuthService : IUserAuthService
 
     public User? Authenticate(string email, string password)
     {
-        var user = _repoResolver("JobSeeker").GetUserByEmail(email)
-                   ?? _repoResolver("Hr").GetUserByEmail(email);
+        var user = _repoResolver(UserType.JobSeeker).GetUserByEmail(email)
+                   ?? _repoResolver(UserType.Hr).GetUserByEmail(email);
 
         if (user == null)
             return null;
