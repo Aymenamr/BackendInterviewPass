@@ -32,9 +32,9 @@ namespace InterviewPass.DataAccess.Services
 			return _dbContext.UserHrs.FirstOrDefault(x => x.Login == login);
 		}
 
-		public User GetUserByEmail(string email)
+		public User GetUserByLogin(string login)
 		{
-			return _dbContext.UserJobSeekers.Include(user => user.SkillBySeekers).ThenInclude(sbs => sbs.Skill).FirstOrDefault(user => user.Email == email);
+			return _dbContext.UserJobSeekers.Include(user => user.SkillBySeekers).ThenInclude(sbs => sbs.Skill).FirstOrDefault(user =>string.Equals(user.Login , login, StringComparison.OrdinalIgnoreCase)  );
 		}
         public User GetUserById(string id)
         {
@@ -46,5 +46,7 @@ namespace InterviewPass.DataAccess.Services
 			List<User> hrs = [.. _dbContext.UserHrs.ToList()];
 			return hrs;
 		}
-	}
+
+      
+    }
 }

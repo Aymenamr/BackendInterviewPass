@@ -11,12 +11,9 @@ namespace InterviewPass.WebApi.Models.User
 		public string Name { get; set; }
 
 		[Required]
-		[RegularExpression(@"^[a-zA-Z0-9_-]+$", ErrorMessage = "Login can only contain letters, numbers, hyphens (-), and underscores (_).")]
-		public string Login { get; set; }
-
-		[RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email address format.")]
-		public string Email { get; set; }
-
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email address format.")]
+        public string Login { get; set; }
+ 
 		[Required]
 		public string Password { get; set; }
 

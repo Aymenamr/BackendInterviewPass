@@ -5,7 +5,7 @@ namespace InterviewPass.DataAccess.Repositories.Interfaces
 	public interface IUserRepository
 	{
 		User GetUser(string id);
-		User GetUserByEmail(string email);
+		User GetUserByLogin(string login);
 		List<User> GetUsers();
 		void DeleteUser(string id);
 		void AddUser(User user);

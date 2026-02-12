@@ -10,13 +10,11 @@ namespace InterviewPass.DataAccess.Entities
     {
         public string Id { get; set; } = null!;
 
-        public string? Login { get; set; }
+        public string Login { get; set; } =null!;
 
         public string Name { get; set; } = null!;
 
         public DateTime? DateOfBirth { get; set; }
-
-        public string? Email { get; set; }
 
         public string? Phone { get; set; }
 

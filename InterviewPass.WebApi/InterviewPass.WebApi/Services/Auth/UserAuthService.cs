@@ -15,10 +15,10 @@ public class UserAuthService : IUserAuthService
         _passwordService = passwordService;
     }
 
-    public User? Authenticate(string email, string password)
+    public User? Authenticate(string login, string password)
     {
-        var user = _repoResolver(UserType.JobSeeker).GetUserByEmail(email)
-                   ?? _repoResolver(UserType.Hr).GetUserByEmail(email);
+        var user = _repoResolver(UserType.JobSeeker).GetUserByLogin(login)
+                   ?? _repoResolver(UserType.Hr).GetUserByLogin(login);
 
         if (user == null)
             return null;

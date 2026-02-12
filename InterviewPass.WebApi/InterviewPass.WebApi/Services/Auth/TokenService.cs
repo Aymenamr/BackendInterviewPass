@@ -27,7 +27,7 @@ public class TokenService : ITokenService
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Email, user.Login),
             new Claim(ClaimTypes.Name, user.Name),
             new Claim(ClaimTypes.Role, user is UserJobSeeker  ? UserType.JobSeeker.ToString() : UserType.Hr.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())

@@ -218,8 +218,7 @@ public partial class InterviewPassContext : DbContext
 			entity.Property(e => e.Id).HasColumnType("STRING");
 			entity.Property(e => e.Company).HasColumnType("STRING");
 			entity.Property(e => e.DateOfBirth).HasColumnType("DATETIME");
-			entity.Property(e => e.Email).HasColumnType("STRING");
-			entity.Property(e => e.Login).HasColumnType("STRING");
+ 			entity.Property(e => e.Login).HasColumnType("STRING");
 			entity.Property(e => e.Name).HasColumnType("STRING");
 			entity.Property(e => e.PasswordHash).HasColumnType("STRING");
 			entity.Property(e => e.Phone).HasColumnType("STRING");
@@ -233,8 +232,7 @@ public partial class InterviewPassContext : DbContext
 
 			entity.Property(e => e.Id).HasColumnType("STRING");
 			entity.Property(e => e.DateOfBirth).HasColumnType("DATETIME");
-			entity.Property(e => e.Email).HasColumnType("STRING");
-			entity.Property(e => e.Login).HasColumnType("STRING");
+ 			entity.Property(e => e.Login).HasColumnType("STRING");
 			entity.Property(e => e.Name).HasColumnType("STRING");
 			entity.Property(e => e.PasswordHash).HasColumnType("VARCHAR");
 			entity.Property(e => e.Phone).HasColumnType("VARCHAR");
@@ -249,8 +247,9 @@ public partial class InterviewPassContext : DbContext
 			entity.Property(e => e.Id).HasColumnType("STRING");
 			entity.Property(e => e.Title).HasColumnType("STRING");
 			entity.Property(e => e.ShortDescription).HasColumnType("STRING");
-			entity.Property(e => e.Image).HasColumnType("varbinary(max)");
-			entity.Property(e => e.Experience).HasColumnType("INTEGER");
+            entity.Property(e => e.Image)
+                  .HasColumnType("BLOB");
+            entity.Property(e => e.Experience).HasColumnType("INTEGER");
 			entity.Property(e => e.WorkingSchedule).HasColumnType("STRING");
 			entity.Property(e => e.Role).HasColumnType("STRING");
 			entity.Property(e => e.Salary).HasColumnType("DOUBLE");
@@ -323,8 +322,8 @@ public partial class InterviewPassContext : DbContext
 			entity.ToTable("JobFile");
 
 			entity.Property(e => e.Id).HasColumnType("STRING").IsRequired();
-			entity.Property(e => e.File).HasColumnType("varbinary(max)");
-			entity.Property(e => e.FileName).HasColumnType("STRING").IsRequired(false);
+            entity.Property(e => e.File).HasColumnType("BLOB");
+            entity.Property(e => e.FileName).HasColumnType("STRING").IsRequired(false);
 			entity.Property(e => e.JobId).HasColumnType("STRING").IsRequired(false);
 
 			entity.HasOne(d => d.Job).WithMany(j => j.JobFiles).HasForeignKey(d => d.JobId)
