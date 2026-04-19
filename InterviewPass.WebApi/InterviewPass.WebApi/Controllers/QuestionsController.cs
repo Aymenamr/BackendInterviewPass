@@ -1,14 +1,10 @@
-﻿using AutoMapper;
-using InterviewPass.DataAccess.Entities;
-using InterviewPass.DataAccess.UnitOfWork;
 using InterviewPass.WebApi.Examples;
-using InterviewPass.WebApi.Extensions;
 using InterviewPass.WebApi.Models.Question;
+using InterviewPass.WebApi.Models.ResponseResult;
+using InterviewPass.WebApi.Processors.Question;
+using InterviewPass.WebApi.Validators.Question;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Filters;
-using System;
-using System.Collections.Generic;
 
 namespace InterviewPass.WebApi.Controllers
 {
@@ -17,14 +13,17 @@ namespace InterviewPass.WebApi.Controllers
     public class QuestionController : ControllerBase
     {
         private readonly ILogger<QuestionController> _logger;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        private readonly IQuestionProcessor _questionProcessor;
+        private readonly IQuestionValidator _questionValidator;
 
-        public QuestionController(ILogger<QuestionController> logger, IUnitOfWork unitOfWork, IMapper mapper)
+        public QuestionController(
+            ILogger<QuestionController> logger,
+            IQuestionProcessor questionProcessor,
+            IQuestionValidator questionValidator)
         {
             _logger = logger;
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
+            _questionProcessor = questionProcessor;
+            _questionValidator = questionValidator;
         }
 
         /// <summary>
@@ -35,9 +34,7 @@ namespace InterviewPass.WebApi.Controllers
         {
             try
             {
-                var questionEntity = _unitOfWork.QuestionRepo.GetAll();
-                var result = _mapper.Map<List<QuestionModel>>(questionEntity);
-                return Ok(result);
+                return Ok(_questionProcessor.GetAll());
             }
             catch (Exception ex)
             {
@@ -52,12 +49,11 @@ namespace InterviewPass.WebApi.Controllers
         [HttpGet("{id}")]
         public IActionResult GetById(string id)
         {
-            var questionEntity = _unitOfWork.QuestionRepo.GetByProperty(q => q.Id == id);
-            if (questionEntity == null)
+            var question = _questionProcessor.GetById(id);
+            if (question == null)
                 return NotFound("Question not found");
 
-            var result = _mapper.Map<QuestionModel>(questionEntity);
-            return Ok(result);
+            return Ok(question);
         }
 
         /// <summary>
@@ -71,12 +67,14 @@ namespace InterviewPass.WebApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var questionEntity = model.GetQuestionEntiy(_mapper);
-            _unitOfWork.QuestionRepo.Add(questionEntity);
-            _unitOfWork.Save();
+            var validationResult = _questionValidator.ValidateForCreate(model);
+            if (validationResult is ErrorResponse createError)
+            {
+                return StatusCode(createError.StatusCode, createError.Message);
+            }
 
-            var createdModel = questionEntity.GetQuestionModel(_mapper);
-            return CreatedAtAction(nameof(GetById), new { id = questionEntity.Id }, createdModel);
+            var createdModel = _questionProcessor.Create(model);
+            return CreatedAtAction(nameof(GetById), new { id = createdModel.Id }, createdModel);
         }
 
         /// <summary>
@@ -88,15 +86,17 @@ namespace InterviewPass.WebApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var existing = _unitOfWork.QuestionRepo.GetByProperty(q => q.Id == id);
-            if (existing == null)
+            var validationResult = _questionValidator.ValidateForUpdate(id, model);
+            if (validationResult is ErrorResponse updateError)
+            {
+                return StatusCode(updateError.StatusCode, updateError.Message);
+            }
+
+            var updatedQuestion = _questionProcessor.Update(id, model);
+            if (updatedQuestion == null)
                 return NotFound("Question not found");
 
-            _mapper.Map(model, existing);
-            _unitOfWork.QuestionRepo.Update(existing);
-            _unitOfWork.Save();
-
-            return Ok("Question updated successfully");
+            return Ok(updatedQuestion);
         }
 
         /// <summary>
@@ -105,12 +105,9 @@ namespace InterviewPass.WebApi.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
-            var question = _unitOfWork.QuestionRepo.GetByProperty(q => q.Id == id);
-            if (question == null)
+            var deleted = _questionProcessor.Delete(id);
+            if (!deleted)
                 return NotFound("Question not found");
-
-            _unitOfWork.QuestionRepo.Delete(question);
-            _unitOfWork.Save();
 
             return Ok("Question deleted successfully");
         }
