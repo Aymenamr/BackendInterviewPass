@@ -11,8 +11,12 @@ using InterviewPass.WebApi.Models.Question;
 using InterviewPass.WebApi.Models.User;
 using InterviewPass.WebApi.Processors;
 using InterviewPass.WebApi.Processors.Exam;
+using InterviewPass.WebApi.Processors.Question;
+using InterviewPass.WebApi.Processors.Result;
 using InterviewPass.WebApi.Processors.Skill;
 using InterviewPass.WebApi.Validators.Exam;
+using InterviewPass.WebApi.Validators.Question;
+using InterviewPass.WebApi.Validators.Result;
 using InterviewPass.WebApi.Validators.Skill;
 using JsonSubTypes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -141,7 +145,7 @@ builder.Services.AddSwaggerExamplesFromAssemblyOf<UserExampleDocumentation>();
 builder.Services.AddSwaggerExamplesFromAssemblyOf<ExamExampleDocumentation>();
 builder.Services.AddSwaggerExamplesFromAssemblyOf<JobExampleDocumentation>();
 
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddAutoMapper(_ => { }, typeof(MappingProfile).Assembly);
 
 // Configure Serilog
 builder.Host.UseSerilog((context, loggerConfiguration) =>
@@ -157,10 +161,14 @@ builder.Services.AddTransient<DbContext, InterviewPassContext>();
 builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IExamProcessor, ExamProcessor>();
+builder.Services.AddTransient<IQuestionProcessor, QuestionProcessor>();
+builder.Services.AddTransient<IResultProcessor, ResultProcessor>();
 builder.Services.AddTransient<IJobProcessor, JobProcessor>();
 builder.Services.AddTransient<JobSeekerRepository>();
 builder.Services.AddTransient<HrRepository>();
 builder.Services.AddTransient<IExamValidator, ExamValidator>();
+builder.Services.AddTransient<IQuestionValidator, QuestionValidator>();
+builder.Services.AddTransient<IResultValidator, ResultValidator>();
 builder.Services.AddTransient<ISkillProcessor, SkillProcessor>();
 builder.Services.AddTransient<ISkillValidator, SkillValidator>();
 builder.Services.AddTransient<IUserValidator, UserValidator>();
