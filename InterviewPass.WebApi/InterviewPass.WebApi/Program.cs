@@ -4,6 +4,9 @@ using InterviewPass.DataAccess.Repositories.Interfaces;
 using InterviewPass.DataAccess.Services;
 using InterviewPass.DataAccess.UnitOfWork;
 using InterviewPass.Infrastructure.Middlewares;
+using InterviewPass.WebApi.Authorization.Handlers;
+using InterviewPass.WebApi.Authorization.Requirements;
+using InterviewPass.WebApi.Controllers;
 using InterviewPass.WebApi.Enums;
 using InterviewPass.WebApi.Examples;
 using InterviewPass.WebApi.Mapper;
@@ -18,21 +21,19 @@ using InterviewPass.WebApi.Validators.Exam;
 using InterviewPass.WebApi.Validators.Question;
 using InterviewPass.WebApi.Validators.Result;
 using InterviewPass.WebApi.Validators.Skill;
+using InterviewPass.WebApi.Validators.user;
 using JsonSubTypes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using InterviewPass.WebApi.Validators.user;
-using Microsoft.OpenApi.Models;
-using InterviewPass.WebApi.Authorization.Requirements;
-using InterviewPass.WebApi.Authorization.Handlers;
-using Microsoft.AspNetCore.Authorization;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -172,6 +173,7 @@ builder.Services.AddTransient<IResultValidator, ResultValidator>();
 builder.Services.AddTransient<ISkillProcessor, SkillProcessor>();
 builder.Services.AddTransient<ISkillValidator, SkillValidator>();
 builder.Services.AddTransient<IUserValidator, UserValidator>();
+builder.Services.AddScoped<IJobValidator, JobValidator>();
 
 //builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddTransient<Func<UserType, IUserRepository>>(serviceProvider => key =>

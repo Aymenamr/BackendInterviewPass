@@ -16,24 +16,27 @@ namespace InterviewPass.WebApi.Controllers
 		private readonly ILogger<JobController> _logger;
 		private readonly IGenericRepository<Job> _jobRepository;
 		private readonly IJobProcessor _jobProcessor;
+        private readonly IJobValidator _jobValidator;
 
 
-		private readonly IMapper _mapper;
-		public JobController(ILogger<JobController> logger, IJobProcessor IJobProcessor, IGenericRepository<Job> jobRepository, IMapper mapper)
+        private readonly IMapper _mapper;
+		public JobController(ILogger<JobController> logger, IJobProcessor IJobProcessor, IGenericRepository<Job> jobRepository, IMapper mapper, IJobValidator jobValidator)   
+
 		{
 			_logger = logger;
 			_jobRepository = jobRepository;
 			_mapper = mapper;
 			_jobProcessor = IJobProcessor;
-			//	_jobRepo = jobRepo;
-		}
-		/// <summary>
-		/// return the list of all jobs .
-		/// </summary>
-		/// <returns></returns>
-		/// <response code="200">Returns the list of jobs successfully.</response>
-		/// <response code="500">If an internal server error occurs while retrieving the jobs.</response>
-		[HttpGet]
+            _jobValidator = jobValidator; 
+            //	_jobRepo = jobRepo;
+        }
+        /// <summary>
+        /// return the list of all jobs .
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="200">Returns the list of jobs successfully.</response>
+        /// <response code="500">If an internal server error occurs while retrieving the jobs.</response>
+        [HttpGet]
 		public IActionResult GetJobs()
 		{
 			return Ok(_mapper.Map<List<JobModel>>(_jobRepository.GetAll()));
@@ -88,10 +91,10 @@ namespace InterviewPass.WebApi.Controllers
 		[SwaggerRequestExample(typeof(JobModel), typeof(JobExampleDocumentation))]
 		public IActionResult Post([FromBody] JobModel jobModel)
 		{
-			if (_jobRepository.GetByProperty(jb => jb.Title == jobModel.Title) != null)
-				return Conflict("Job already exists");
+            if (_jobValidator.JobExists(jobModel.Title))
+                return Conflict("Job already exists");
 
-			JobModel jobToReturn = _jobProcessor.ProcessAddJob(jobModel);
+            JobModel jobToReturn = _jobProcessor.ProcessAddJob(jobModel);
 
 			return CreatedAtAction(nameof(Post), new { id = jobToReturn.Id }, jobModel);
 		}
